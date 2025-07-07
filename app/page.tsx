@@ -1,4 +1,3 @@
-// app/page.tsx
 'use client'
 
 import { useState } from "react"
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import BoardPreview from "@/components/BoardPreview"
 import {
   Users,
   BookOpen,
@@ -81,6 +80,7 @@ export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [location, setLocation] = useState("")
+  const [showBoard, setShowBoard] = useState(false)
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
@@ -196,18 +196,22 @@ export default function HomePage() {
                     size="lg"
                     className="px-8 py-6 text-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                 >
-                  함께 시작하기
+                  <Link href="/login">함께 시작하기</Link>
                   <ChevronRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button
                     variant="outline"
                     size="lg"
                     className="px-8 py-6 text-lg border-emerald-300 text-emerald-700 hover:bg-emerald-50 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                    onClick={() => setShowBoard(prev => !prev)}
                 >
                   둘러보기
                 </Button>
               </div>
             </div>
+
+            {/* 게시판 섹션 토글 */}
+            {showBoard && <BoardPreview />}
 
             {/* Search Section */}
             <div className="max-w-4xl mx-auto">
