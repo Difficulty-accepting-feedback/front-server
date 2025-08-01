@@ -38,8 +38,12 @@ export default function Header() {
                         />
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 transition-colors hover:text-green-500" />
                     </div>
-                    <Button variant="outline" className="transition-transform hover:scale-105">로그인</Button>
+                    <Link href="/login">
+                        <Button variant="outline" className="transition-transform hover:scale-105">로그인</Button>
+                    </Link>
+                    <Link href="/login">
                     <Button className="bg-green-500 hover:bg-green-600 transition-transform hover:scale-105">회원가입</Button>
+                    </Link>
                 </div>
 
                 {/* 모바일 메뉴 (Sheet로 슬라이드 효과) */}
