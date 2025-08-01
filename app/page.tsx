@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import BoardPreview from "@/components/BoardPreview"
 import {
-  Users,
   BookOpen,
   Music,
   Dumbbell,
@@ -16,20 +15,15 @@ import {
   Palette,
   Utensils,
   Code,
-  Leaf,
   Star,
   Search,
   MapPin,
-  Menu,
-  X,
   ChevronRight,
   Sparkles,
   Heart,
-  Award,
   Target,
   TrendingUp,
   ArrowRight,
-  Globe,
   Coffee,
   Gamepad2,
   Scissors,
