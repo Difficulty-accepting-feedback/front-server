@@ -5,7 +5,7 @@ import Header from '@/components/Header' // 메인 페이지 헤더 컴포넌트
 import Footer from '@/components/Footer' // 메인 페이지 푸터 컴포넌트
 import {Toaster} from '@/components/ui/sonner'  // Shadcn 버전의 Sonner import
 
-const inter = Inter({subsets: ['latin']})
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -28,13 +28,14 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="ko">
+        <html lang="ko" className="h-full">
         <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Header/> {/* 모든 페이지에 적용될 헤더 */}
-        <main>{children}</main> {/* 각 페이지의 콘텐츠가 들어갈 부분 */}
-        <Footer/> {/* 모든 페이지에 적용될 푸터 */}
-        <Toaster richColors/> {/* richColors로 성공/오류 색상 자동 적용 */}
+            className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased min-h-screen flex flex-col`}
+        >
+        <Header /> {/* 모든 페이지에 적용될 헤더 */}
+        <main className="flex-1">{children}</main> {/* 남는 높이를 차지 */}
+        <Footer /> {/* 모든 페이지에 적용될 푸터 */}
+        <Toaster richColors /> {/* richColors로 성공/오류 색상 자동 적용 */}
         </body>
         </html>
     );

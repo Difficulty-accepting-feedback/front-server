@@ -86,7 +86,7 @@ export default function LoginPage() {
                     <button
                         type="button"
                         onClick={() => go('google')}
-                        aria-label="Google로 계속하기"
+                        aria-label="Google로 로그인"
                         className="relative w-full h-12 rounded-md border border-[#DADCE0] bg-white hover:bg-gray-50 transition-colors flex items-center justify-center"
                     >
             <span className="absolute left-3 inline-flex">
@@ -98,7 +98,7 @@ export default function LoginPage() {
                 <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3A12 12 0 0 1 24 36c-3.6 0-6.8-1.7-8.9-4.4l-7.1 5.5A20 20 0 0 0 24 44c10.5 0 19-8.5 19-19 0-1.2-.1-2.1-.4-3.5z"/>
               </svg>
             </span>
-                        <span className="text-sm font-medium text-gray-700">Google로 계속하기</span>
+                        <span className="text-sm font-bold text-gray-700">Google로 로그인</span>
                     </button>
 
                     {/* Kakao */}
@@ -114,7 +114,7 @@ export default function LoginPage() {
                 <path fill="#191919" d="M12 3C6.48 3 2 6.29 2 10.36c0 2.42 1.6 4.54 4.02 5.83L5 21l4.22-2.25c.88.16 1.8.25 2.78.25 5.52 0 10-3.29 10-7.36C22 6.29 17.52 3 12 3z"/>
               </svg>
             </span>
-                        <span className="text-sm font-bold text-[#191919]">카카오로 로그인</span>
+                        <span className="text-sm font-bold text-gray-700">카카오로 로그인</span>
                     </button>
 
                     {/* Naver */}

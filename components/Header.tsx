@@ -132,49 +132,49 @@ export default function Header() {
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/" className="flex items-center w-full">
+                                    <Link href="/me" className="flex items-center w-full">
                                         <Home className="w-4 h-4 mr-2" />
                                         홈
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/study" className="flex items-center w-full">
+                                    <Link href="/me/study" className="flex items-center w-full">
                                         <BookOpen className="w-4 h-4 mr-2" />
                                         스터디
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/hobby" className="flex items-center w-full">
+                                    <Link href="/me/hobby" className="flex items-center w-full">
                                         <Palette className="w-4 h-4 mr-2" />
                                         취미
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/mentoring" className="flex items-center w-full">
+                                    <Link href="/me/mentoring" className="flex items-center w-full">
                                         <Users className="w-4 h-4 mr-2" />
                                         멘토링
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/dashboard" className="flex items-center w-full">
+                                    <Link href="/me/dashboard" className="flex items-center w-full">
                                         <LayoutDashboard className="w-4 h-4 mr-2" />
                                         대시보드
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/purchase-history" className="flex items-center w-full">
+                                    <Link href="/me/purchase-history" className="flex items-center w-full">
                                         <ShoppingCart className="w-4 h-4 mr-2" />
-                                        구매 내역
+                                        결제 내역
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/ai-coaching" className="flex items-center w-full">
+                                    <Link href="/me/ai-coaching" className="flex items-center w-full">
                                         <Brain className="w-4 h-4 mr-2" />
                                         AI 코칭
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/settings" className="flex items-center w-full">
+                                    <Link href="/me/account" className="flex items-center w-full">
                                         <Settings className="w-4 h-4 mr-2" />
                                         설정
                                     </Link>
