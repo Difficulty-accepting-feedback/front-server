@@ -108,7 +108,7 @@ export default function HomePage() {
                     size="lg"
                     className="px-8 py-6 text-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                 >
-                  <Link href="/login">함께 시작하기</Link>
+                  <Link href="/auth/login">함께 시작하기</Link>
                   <ChevronRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Button

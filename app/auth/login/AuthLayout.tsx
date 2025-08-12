@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { Leaf } from "lucide-react"
+import Link from 'next/link'
+import { Leaf } from 'lucide-react'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -29,9 +29,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </div>
 
             {/* Right auth card */}
-            <div className="flex w-full lg:w-1/2 items-center justify-center p-8">
-                {children}
-            </div>
+            <div className="flex w-full lg:w-1/2 items-center justify-center p-8">{children}</div>
         </div>
     )
 }
