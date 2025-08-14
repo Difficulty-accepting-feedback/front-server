@@ -16,73 +16,59 @@ export default function MeetingPage({ params }: { params: { roomName: string } }
     if (!joined) {
         // 닉네임 입력 UI
         return (
-            <div className="flex min-h-screen items-center justify-center bg-green-50 p-6">
-                <Card className="w-full max-w-md shadow-lg">
-                    <CardHeader className="text-center space-y-3">
-                        <Badge variant="secondary" className="mx-auto flex items-center gap-2 px-3 py-1">
-                            <Users size={16} />
-                            회의 참가
-                        </Badge>
-                        <CardTitle className="text-2xl font-bold">회의 방: {decodedRoomName}</CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                            채팅과 참가자 목록에 표시될 이름을 입력하세요.
-                        </p>
+            <div className="flex items-center justify-center min-h-screen bg-gray-100">
+                <Card className="w-full max-w-md">
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-bold text-center">회의 참여</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <Input
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="닉네임 입력"
-                            className="h-11"
-                            autoFocus
-                        />
-                        <Button
-                            disabled={!name.trim()}
-                            onClick={() => setJoined(true)}
-                            className="w-full h-11 text-white font-semibold"
-                        >
-                            회의 참가하기
-                        </Button>
+                    <CardContent>
+                        <div className="space-y-4">
+                            <div className="flex items-center space-x-2">
+                                <Video className="h-5 w-5 text-blue-500" />
+                                <Badge variant="secondary">방 이름: {decodedRoomName}</Badge>
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="name" className="text-sm font-medium">
+                                    채팅과 참가자 목록에 표시될 이름을 입력하세요.
+                                </label>
+                                <Input
+                                    id="name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="이름 입력"
+                                    required
+                                />
+                            </div>
+                            <Button
+                                onClick={() => setJoined(true)}
+                                disabled={!name}
+                                className="w-full"
+                            >
+                                <Users className="mr-2 h-4 w-4" /> 회의 참여
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
         );
     }
 
-    // 회의 UI
-    // @ts-ignore
+    // Jitsi 회의 UI
     return (
-        <div className="p-6 space-y-4 bg-green-50 min-h-screen">
-            <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full">
-                    <Video size={18} className="text-green-700" />
-                    <span className="font-semibold text-green-800">
-            {decodedRoomName}
-          </span>
-                </div>
-                <Badge variant="secondary">{name}</Badge>
-            </div>
-
-            <div className="w-full rounded-md border border-gray-200 overflow-hidden bg-white shadow">
-                <JitsiMeeting
-                    domain="meet.jit.si"
-                    roomName={decodedRoomName}
-                    userInfo={{ displayName: name }}
-                    configOverwrite={{
-                        startWithAudioMuted: true,
-                        prejoinConfig: { enabled: false },
-                    }}
-                    interfaceConfigOverwrite={{
-                        TOOLBAR_BUTTONS: [
-                            'microphone', 'camera', 'raisehand', 'chat', 'tileview', 'hangup',
-                            'settings', 'videoquality',
-                        ],
-                    }}
-                    getIFrameRef={(node) => {
-                        if (node) node.style.height = '720px';
-                    }}
-                />
-            </div>
+        <div className="w-full h-screen">
+            <JitsiMeeting
+                roomName={decodedRoomName}
+                userInfo={{ displayName: name, email: '' }}
+                interfaceConfigOverwrite={{
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false,
+                    DEFAULT_BACKGROUND: '#000',
+                }}
+                getIFrameRef={(node) => {
+                    node.style.height = '100%';
+                    node.style.width = '100%';
+                }}
+            />
         </div>
     );
 }
