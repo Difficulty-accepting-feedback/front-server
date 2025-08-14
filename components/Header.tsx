@@ -162,7 +162,7 @@ export default function Header() {
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/me/purchase-history" className="flex items-center w-full">
+                                    <Link href="/me/payment/history" className="flex items-center w-full">
                                         <ShoppingCart className="w-4 h-4 mr-2" />
                                         결제 내역
                                     </Link>
