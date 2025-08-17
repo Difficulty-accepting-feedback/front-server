@@ -1,16 +1,24 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { fetchMyPayments, fetchPlans, PaymentHistoryItem, PlanResponse } from '@/lib/payment-api';
+import { toast } from 'sonner';
+import {
+    fetchMyPayments,
+    fetchPlans,
+    cancelPayment,
+    PaymentHistoryItem,
+    PlanResponse,
+} from '@/lib/payment-api';
 import { useMember } from '@/hooks/useMember';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 
 function statusColor(s: string) {
     switch (s) {
         case 'DONE': return 'bg-emerald-600/15 text-emerald-700';
-        case 'READY': return 'bg-gray-600/10 text-gray-700'; // (필터링으로 실제 표시되진 않음)
+        case 'READY': return 'bg-gray-600/10 text-gray-700';
         case 'CANCELLED': return 'bg-red-600/15 text-red-700';
         case 'CANCEL_REQUESTED': return 'bg-amber-600/15 text-amber-700';
         case 'AUTO_BILLING_READY': return 'bg-blue-600/15 text-blue-700';
@@ -37,37 +45,46 @@ function statusLabel(s: string) {
     }
 }
 
+// 취소 가능 조건(필요시 조정)
+function isCancelable(status: string) {
+    return status === 'DONE' || status === 'AUTO_BILLING_APPROVED';
+}
+
 export default function PaymentHistoryPage() {
     const { data: me } = useMember();
     const [loading, setLoading] = useState(true);
     const [items, setItems] = useState<PaymentHistoryItem[]>([]);
     const [plans, setPlans] = useState<PlanResponse[]>([]);
+    const [busyOrderId, setBusyOrderId] = useState<string | null>(null);
+
+    async function reload(memberId: number) {
+        const [list, planList] = await Promise.all([
+            fetchMyPayments(memberId),
+            fetchPlans(),
+        ]);
+        setItems(list);
+        setPlans(planList);
+    }
 
     useEffect(() => {
         (async () => {
             if (!me?.memberId) return;
             try {
                 setLoading(true);
-                const [list, planList] = await Promise.all([
-                    fetchMyPayments(me.memberId),
-                    fetchPlans(),
-                ]);
-                setItems(list);
-                setPlans(planList);
+                await reload(me.memberId);
             } finally {
                 setLoading(false);
             }
         })();
     }, [me?.memberId]);
 
-    // planId → Plan 매핑
     const planMap = useMemo(() => {
         const m = new Map<number, PlanResponse>();
         plans.forEach(p => m.set(p.planId, p));
         return m;
     }, [plans]);
 
-    // ✅ READY 상태는 히스토리에서 제외
+    // READY는 숨김
     const filteredItems = useMemo(
         () => items.filter(p => p.payStatus !== 'READY'),
         [items]
@@ -94,9 +111,39 @@ export default function PaymentHistoryPage() {
     };
 
     const HEADERS = useMemo(
-        () => ['결제ID', '주문번호', '유형', '금액', '상태', '결제수단', '최근 이력'],
+        () => ['결제ID', '주문번호', '유형', '금액', '상태', '결제수단', '관리'],
         []
     );
+
+    const onCancel = async (p: PaymentHistoryItem) => {
+        if (!me?.memberId) {
+            toast.error('로그인이 필요합니다.');
+            return;
+        }
+        if (!isCancelable(p.payStatus)) {
+            toast.error('현재 상태에서는 취소할 수 없습니다.');
+            return;
+        }
+        const amount = p.totalAmount ?? 0;
+        const ok = window.confirm(`해당 결제를 취소할까요?\n주문번호: ${p.orderId}\n금액: ₩${amount.toLocaleString('ko-KR')}`);
+        if (!ok) return;
+
+        try {
+            setBusyOrderId(p.orderId);
+            await cancelPayment({
+                memberId: me.memberId,
+                orderId: p.orderId,
+                cancelAmount: amount,           // 전체 취소 (부분취소 필요 시 UI로 금액 입력 받아 전달)
+                cancelReason: 'USER_REQUEST',
+            });
+            toast.success('결제가 취소되었습니다.');
+            await reload(me.memberId);
+        } catch (e: any) {
+            toast.error(e?.message ?? '결제 취소에 실패했습니다.');
+        } finally {
+            setBusyOrderId(null);
+        }
+    };
 
     if (loading) {
         return (
@@ -150,7 +197,19 @@ export default function PaymentHistoryPage() {
                                     </td>
                                     <td>{p.method ?? '-'}</td>
                                     <td className="text-muted-foreground">
-                                        {last ? `${statusLabel(last.status)} • ${new Date(last.changedAt).toLocaleString('ko-KR')}` : '-'}
+                                        <div className="flex items-center gap-3">
+                                            {isCancelable(p.payStatus) && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="h-7"
+                                                    onClick={() => onCancel(p)}
+                                                    disabled={busyOrderId === p.orderId}
+                                                >
+                                                    {busyOrderId === p.orderId ? '취소 중…' : '결제 취소'}
+                                                </Button>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             );
