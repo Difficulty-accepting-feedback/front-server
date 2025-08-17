@@ -1,4 +1,4 @@
-import { PAYMENT_BASE_URL } from '@/lib/env';
+import {PAYMENT_BASE_URL} from '@/lib/env';
 
 type RsData<T> = { code: string; msg: string; data: T };
 
@@ -11,7 +11,7 @@ export type PlanResponse = {
 };
 
 export async function fetchPlans(): Promise<PlanResponse[]> {
-    const res = await fetch(`${PAYMENT_BASE_URL}/api/plans`, { cache: 'no-store' });
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/plans`, {cache: 'no-store'});
     if (!res.ok) throw new Error('플랜 조회 실패');
     const json: RsData<PlanResponse[]> = await res.json();
     return json.data;
@@ -33,7 +33,7 @@ export async function createOrder(opts: {
     planId: number;
     amount: number;
 }): Promise<PaymentInitResponse> {
-    const { memberId, planId, amount } = opts;
+    const {memberId, planId, amount} = opts;
     const res = await fetch(
         `${PAYMENT_BASE_URL}/api/payments/create?planId=${planId}&amount=${amount}`,
         {
@@ -58,7 +58,7 @@ export async function confirmPayment(opts: {
     amount: number;
     idempotencyKey?: string;
 }): Promise<number> {
-    const { memberId, paymentKey, orderId, amount } = opts;
+    const {memberId, paymentKey, orderId, amount} = opts;
     const idem = opts.idempotencyKey ?? crypto.randomUUID();
     const res = await fetch(`${PAYMENT_BASE_URL}/api/payments/confirm`, {
         method: 'POST',
@@ -67,7 +67,7 @@ export async function confirmPayment(opts: {
             'X-Authorization-Id': String(memberId),
             'Idempotency-Key': idem,
         },
-        body: JSON.stringify({ paymentKey, orderId, amount }),
+        body: JSON.stringify({paymentKey, orderId, amount}),
         credentials: 'include',
     });
     if (!res.ok) throw new Error('결제 승인 실패');
@@ -86,6 +86,43 @@ export type PaymentHistoryItem = {
     histories: { status: string; changedAt: string; reasonDetail: string | null }[];
 };
 
+export async function cancelPayment(opts: {
+    memberId: number;
+    orderId: string;
+    cancelAmount: number;
+    cancelReason?: 'USER_REQUEST' | 'SYSTEM_ERROR' | string;
+}): Promise<PaymentCancelResponse> {
+    const {memberId, orderId, cancelAmount, cancelReason = 'USER_REQUEST'} = opts;
+
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/payments/cancel`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // 백엔드가 헤더에서 memberId를 읽음
+            'X-Authorization-Id': String(memberId),
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            orderId,
+            cancelAmount,
+            cancelReason,
+        }),
+    });
+
+    if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(text || '결제 취소 실패');
+    }
+    const json: RsData<PaymentCancelResponse> = await res.json();
+    return json.data;
+}
+
+export type PaymentCancelResponse = {
+    paymentId: number;
+    status: string;
+};
+
+
 export async function fetchMyPayments(memberId: number): Promise<PaymentHistoryItem[]> {
     const res = await fetch(`${PAYMENT_BASE_URL}/api/payments/query/member`, {
         headers: {
@@ -97,5 +134,75 @@ export async function fetchMyPayments(memberId: number): Promise<PaymentHistoryI
     });
     if (!res.ok) throw new Error('결제 내역 조회 실패');
     const json: RsData<PaymentHistoryItem[]> = await res.json();
+    return json.data;
+}
+
+/** 빌링키 발급 */
+export async function issueBillingKey(opts: {
+    memberId: number;
+    orderId: string;
+    authKey: string;
+    customerKey: string;
+}): Promise<string> {
+    const {memberId, orderId, authKey, customerKey} = opts;
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/payments/billing/issue`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Authorization-Id': String(memberId),
+        },
+        body: JSON.stringify({orderId, authKey, customerKey}),
+        credentials: 'include',
+    });
+    if (!res.ok) throw new Error('빌링키 발급 실패');
+    const json: RsData<string> = await res.json();
+    return json.data; // billingKey
+}
+
+/** 빌링키로 자동결제 승인(첫 결제 포함) */
+export type PaymentConfirmResponse = {
+    paymentId: number;
+    payStatus: string;
+    customerEmail?: string | null;
+    customerName?: string | null;
+};
+
+export async function autoChargeWithBillingKey(opts: {
+    memberId: number;
+    orderId: string;
+    amount: number;
+    billingKey: string;
+    customerKey: string;
+    orderName: string;
+    customerEmail?: string;
+    customerName?: string;
+    taxFreeAmount?: number | null;
+    taxExemptionAmount?: number | null;
+    idempotencyKey?: string;
+}): Promise<PaymentConfirmResponse> {
+    const {
+        memberId, orderId, amount, billingKey, customerKey,
+        orderName, customerEmail, customerName,
+        taxFreeAmount, taxExemptionAmount, idempotencyKey
+    } = opts;
+
+    const idem = idempotencyKey ?? (crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`);
+
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/payments/billing/charge`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Authorization-Id': String(memberId),
+            'Idempotency-Key': idem,
+        },
+        body: JSON.stringify({
+            billingKey, customerKey, amount, orderId, orderName,
+            customerEmail, customerName, taxFreeAmount: taxFreeAmount ?? 0,
+            taxExemptionAmount: taxExemptionAmount ?? 0,
+        }),
+        credentials: 'include',
+    });
+    if (!res.ok) throw new Error('자동결제 승인 실패');
+    const json: RsData<PaymentConfirmResponse> = await res.json();
     return json.data;
 }

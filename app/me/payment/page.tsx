@@ -22,11 +22,7 @@ function splitBenefits(text?: string) {
 function getErrorMessage(e: unknown) {
     if (e instanceof Error) return e.message;
     if (typeof e === 'string') return e;
-    try {
-        return JSON.stringify(e);
-    } catch {
-        return '알 수 없는 오류가 발생했습니다.';
-    }
+    try { return JSON.stringify(e); } catch { return '알 수 없는 오류가 발생했습니다.'; }
 }
 
 export default function PaymentsPage() {
@@ -49,7 +45,7 @@ export default function PaymentsPage() {
     }, []);
 
     const sortedPlans = useMemo(() => {
-        // 페이지 미학: 월간 먼저, 그다음 연간
+        // 페이지 미학: 월간 먼저, 그 다음 연간
         return [...plans].sort((a, b) =>
             a.period === b.period ? a.amount - b.amount : a.period === 'MONTHLY' ? -1 : 1
         );
@@ -64,8 +60,10 @@ export default function PaymentsPage() {
             toast.error('Toss 클라이언트 키가 설정되지 않았습니다.');
             return;
         }
+
         try {
             setBusyPlanId(plan.planId);
+            // 1) 주문 생성 (공통)
             const init = await createOrder({
                 memberId: me.memberId,
                 planId: plan.planId,
@@ -73,16 +71,27 @@ export default function PaymentsPage() {
             });
 
             const toss = await loadTossPayments(TOSS_CLIENT_KEY);
-            await toss.requestPayment('카드', {
-                amount: init.amount,
-                orderId: init.orderId,
-                orderName: init.orderName,
-                // 성공/실패 시 프론트 라우트로 이동 → success 페이지에서 /confirm 호출
-                successUrl: init.successUrl,
-                failUrl: init.failUrl,
 
-                customerName: me.nickname ?? undefined,
-            });
+            if (plan.type === 'SUBSCRIPTION') {
+                // ✅ 구독: 빌링키 발급 플로우 (Billing Auth)
+                const customerKey = `cust_${me.memberId}`; // 백엔드와 동일 규칙
+                await toss.requestBillingAuth('카드', {
+                    customerKey,
+                    // 성공 시: authKey & customerKey 쿼리로 넘어옴 → success 페이지에서 /billing/issue, /billing/charge 호출
+                    successUrl: `${APP_URL}/me/payment/billing/success?orderId=${encodeURIComponent(init.orderId)}&amount=${init.amount}&planId=${plan.planId}`,
+                    failUrl: `${APP_URL}/me/payment/billing/fail?orderId=${encodeURIComponent(init.orderId)}&planId=${plan.planId}`,
+                });
+            } else {
+                // ✅ 일회성: 일반 결제 플로우
+                await toss.requestPayment('카드', {
+                    amount: init.amount,
+                    orderId: init.orderId,
+                    orderName: init.orderName,
+                    successUrl: init.successUrl,
+                    failUrl: init.failUrl,
+                    customerName: me.nickname ?? undefined,
+                });
+            }
         } catch (e: unknown) {
             toast.error(getErrorMessage(e) ?? '결제 요청에 실패했습니다.');
         } finally {
@@ -123,9 +132,7 @@ export default function PaymentsPage() {
                                     className="relative border-2 border-emerald-100 bg-white/70 dark:bg-gray-900/40 hover:shadow-xl transition-all"
                                 >
                                     {highlight && (
-                                        <Badge className="absolute -top-3 left-4 bg-amber-500 text-white">
-                                            인기
-                                        </Badge>
+                                        <Badge className="absolute -top-3 left-4 bg-amber-500 text-white">인기</Badge>
                                     )}
                                     <CardHeader>
                                         <div className="flex items-baseline justify-between">
