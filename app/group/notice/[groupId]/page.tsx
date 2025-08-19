@@ -1,87 +1,146 @@
 'use client';
 
+import { use } from 'react';
 import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LayoutGrid, Bell, Share2, Video } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 import NoticeCreateForm from '@/components/notice/NoticeCreateForm';
 import NoticeTable from '@/components/notice/NoticeTable';
+import GroupNavigation from '@/components/navigation/GroupNavigation';
 import { Button } from '@/components/ui/button';
 import { useNoticeList } from '@/hooks/useNotice';
 
-type Props = { params: { groupId: string } };
+type Props = {
+    params: Promise<{ groupId: string }>; // Promise 타입으로 변경
+};
 
 export default function NoticeGroupPage({ params }: Props) {
-    const groupId = Number(params.groupId);
-    const pathname = usePathname();
+    const resolvedParams = use(params);
+    const groupId = Number(resolvedParams.groupId);
     const [showForm, setShowForm] = useState(false);
 
-    // 목록 데이터
-    const { data: notices = [], isLoading } = useNoticeList(groupId);
+    // 공지사항 목록 조회 - 에러가 있어도 페이지는 렌더링됨
+    const { data: notices = [], isLoading, error, refetch } = useNoticeList(groupId);
 
     const MAX_NOTICES = 10;
     const isLimitReached = notices.length >= MAX_NOTICES;
+    const hasError = !!error; // boolean으로 변환
 
-    const navItems = [
-        { name: '대시보드', href: `/group/dashboard/${groupId}`, icon: <LayoutGrid className="h-4 w-4" /> },
-        { name: '공지사항', href: `/group/notice/${groupId}`, icon: <Bell className="h-4 w-4" /> },
-        { name: '자료 공유', href: `/group/share/${groupId}`, icon: <Share2 className="h-4 w-4" /> },
-        { name: '화상 미팅', href: `/meeting/${groupId}`, icon: <Video className="h-4 w-4" /> },
-    ];
+    // 공지사항 생성 폼 토글 함수
+    const handleToggleForm = () => {
+        setShowForm(!showForm);
+    };
 
-    return (
-        <div className="flex max-w-7xl mx-auto px-6 py-6 gap-8">
-            {/* 왼쪽 탭(사이드바) */}
-            <aside className="w-56 flex-shrink-0">
-                <nav className="flex flex-col gap-2">
-                    {navItems.map((item) => {
-                        const active = pathname === item.href;
-                        return (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors 
-                  ${active
-                                    ? 'bg-emerald-100 text-emerald-800'
-                                    : 'text-gray-700 hover:bg-gray-100 hover:text-emerald-700'}`}
-                            >
-                                {item.icon}
-                                {item.name}
-                            </Link>
-                        );
-                    })}
-                </nav>
-            </aside>
+    // 공지사항 생성 완료 후 폼 닫기
+    const handleCreateSuccess = () => {
+        setShowForm(false);
+    };
 
-            {/* 오른쪽 메인 컨텐츠 */}
-            <div className="flex-1 space-y-8">
-                {/* 공지사항 목록 */}
-                <section>
-                    <h2 className="text-xl font-semibold mb-4">공지사항 목록</h2>
-                    <NoticeTable groupId={groupId} />
-                </section>
+    // 공지사항 다시 불러오기
+    const handleRetry = () => {
+        refetch();
+    };
 
-                {/* 새 공지 추가 */}
-                <section className="border-t pt-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-medium">새 공지 추가</h3>
-                        <Button
-                            onClick={() => setShowForm((prev) => !prev)}
-                            disabled={isLoading || isLimitReached}
-                            className="bg-emerald-700 hover:bg-emerald-800"
-                        >
-                            {showForm ? '작성 폼 닫기' : '공지사항 추가하기'}
-                        </Button>
-                    </div>
+    // 공지사항 영역 렌더링 함수
+    const renderNoticeSection = () => {
+        // 로딩 중일 때
+        if (isLoading) {
+            return (
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+                </div>
+            );
+        }
 
-                    {isLimitReached && (
-                        <p className="text-sm text-red-600 mb-4">
-                            최대 {MAX_NOTICES}개의 공지만 등록할 수 있습니다.
+        // 에러가 있을 때
+        if (hasError) {
+            return (
+                <div className="text-center py-12">
+                    <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                        공지사항을 불러오는데 실패했습니다.
+                    </h3>
+                    {error && (
+                        <p className="mt-1 text-sm text-gray-500">
+                            {error.message}
                         </p>
                     )}
+                    <div className="mt-6">
+                        <Button
+                            onClick={handleRetry}
+                            variant="outline"
+                            className="inline-flex items-center"
+                        >
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            다시 시도
+                        </Button>
+                    </div>
+                </div>
+            );
+        }
 
-                    {showForm && !isLimitReached && <NoticeCreateForm groupId={groupId} />}
-                </section>
+        // 공지사항이 없을 때
+        if (notices.length === 0) {
+            return (
+                <div className="text-center py-12">
+                    <div className="mx-auto h-12 w-12 text-gray-400">
+                        📢
+                    </div>
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                        등록된 공지사항이 없습니다
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                        첫 번째 공지사항을 작성해보세요!
+                    </p>
+                </div>
+            );
+        }
+
+        // 공지사항 목록이 있을 때
+        return <NoticeTable notices={notices} />;
+    };
+
+    return (
+        <div className="container mx-auto p-6">
+            {/* 네비게이션 */}
+            <GroupNavigation groupId={groupId} className="mb-8" />
+
+            {/* 공지사항 섹션 */}
+            <div className="bg-white rounded-lg shadow">
+                <div className="px-6 py-4 border-b border-gray-200">
+                    <div className="flex justify-between items-center">
+                        <h1 className="text-xl font-semibold text-gray-900">공지사항</h1>
+                        <div className="flex items-center space-x-4">
+                            {isLimitReached && (
+                                <span className="text-sm text-amber-600">
+                  최대 {MAX_NOTICES}개의 공지만 등록할 수 있습니다.
+                </span>
+                            )}
+                            <Button
+                                onClick={handleToggleForm}
+                                disabled={isLimitReached}
+                                className={isLimitReached ? 'opacity-50 cursor-not-allowed' : ''}
+                            >
+                                {showForm ? '취소' : '공지 작성'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-6">
+                    {/* 공지사항 생성 폼 */}
+                    {showForm && (
+                        <div className="mb-6">
+                            <NoticeCreateForm
+                                groupId={groupId}
+                                onSuccess={handleCreateSuccess}
+                                onCancel={() => setShowForm(false)}
+                            />
+                        </div>
+                    )}
+
+                    {/* 공지사항 목록 */}
+                    {renderNoticeSection()}
+                </div>
             </div>
         </div>
     );
