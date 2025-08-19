@@ -10,7 +10,10 @@ import { MantineProvider, ColorSchemeScript, mantineHtmlProps } from '@mantine/c
 import Header from '@/components/Header' // 메인 페이지 헤더
 import Footer from '@/components/Footer' // 메인 페이지 푸터
 import { Toaster } from '@/components/ui/sonner' // Shadcn Sonner
-import Providers from './providers' // React Query 등 공용 Provider
+import Providers from './providers'
+import SseClient from "@/app/sse-client"; // React Query 등 공용 Provider
+import '@mantine/core/styles.css';
+import 'mantine-datatable/styles.layer.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
@@ -39,6 +42,7 @@ export default function RootLayout({
         <MantineProvider>
             {/* React Query 등 다른 Provider */}
             <Providers>
+                <SseClient />
                 {/* 모든 페이지에 적용될 공통 UI */}
                 <Header />
                 <main className="min-h-screen">{children}</main>

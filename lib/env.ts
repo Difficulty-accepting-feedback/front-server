@@ -6,3 +6,6 @@ export const PAYMENT_BASE_URL =
 
 export const TOSS_CLIENT_KEY =
     process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY ?? '';
+
+export const NOTIFICATION_BASE_URL =
+    process.env.NEXT_PUBLIC_NOTIFICATION_BASE_URL ?? 'http://localhost:8082';
