@@ -136,7 +136,7 @@ export default function NotificationsPage() {
                                 // 내부 empty-row는 사용하지 않기 때문에 명시적으로 끔
                                 noRecordsText={undefined as unknown as string}
                                 columns={[
-                                    { accessor: 'id', title: 'ID', width: 80 },
+                                    { accessor: 'id', title: '순번', width: 80 },
                                     {
                                         accessor: 'title',
                                         title: '유형',
@@ -164,7 +164,7 @@ export default function NotificationsPage() {
                                     },
                                     {
                                         accessor: 'actions',
-                                        title: '액션',
+                                        title: '관리',
                                         width: 200,
                                         render: (r) => (
                                             <div className="flex gap-2">
