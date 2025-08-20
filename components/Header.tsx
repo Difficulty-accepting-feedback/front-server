@@ -36,12 +36,18 @@ import {
     Settings,
 } from 'lucide-react'
 
+// 알림 훅 추가
+import { useUnreadCount } from '@/hooks/useNotifications'
+
 const MEMBER_BASE = 'http://localhost:8080'
 
 export default function Header() {
     const [searchQuery, setSearchQuery] = useState('')
     const { me, loading } = useAuth()
     const isLoggedIn = !!me && !loading
+
+    // 미읽음 카운트(리액트쿼리 캐시 + SSE invalidate)
+    const { data: unreadCount = 0 } = useUnreadCount()
 
     const handleLogout = async () => {
         try {
@@ -123,12 +129,17 @@ export default function Header() {
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
-                                    <Link href="/notifications" className="flex items-center w-full relative">
+                                    <Link href="/me/notifications" className="flex items-center w-full relative">
                                         <Bell className="w-4 h-4 mr-2" />
                                         알림
-                                        <Badge variant="destructive" className="ml-2 h-4 w-4 p-0 flex items-center justify-center">
-                                            2
-                                        </Badge>
+                                        {unreadCount > 0 && (
+                                            <Badge
+                                                variant="destructive"
+                                                className="ml-2 h-4 px-1 flex items-center justify-center"
+                                            >
+                                                {unreadCount}
+                                            </Badge>
+                                        )}
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
@@ -257,12 +268,15 @@ export default function Header() {
                                         </DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
-                                            <Link href="/user/notifications" className="flex items-center w-full">
+                                            {/* 경로 통일: /notifications + 실시간 배지 */}
+                                            <Link href="/me/notifications" className="flex items-center w-full">
                                                 <Bell className="w-4 h-4 mr-2" />
                                                 알림
-                                                <span className="ml-2 inline-flex items-center rounded-full bg-red-500 px-2 py-0.5 text-xs font-medium text-white">
-                          2
-                        </span>
+                                                {unreadCount > 0 && (
+                                                    <span className="ml-2 inline-flex items-center rounded-full bg-red-500 px-2 py-0.5 text-xs font-medium text-white">
+                            {unreadCount}
+                          </span>
+                                                )}
                                             </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem asChild>

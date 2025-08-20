@@ -45,7 +45,6 @@ export default function PaymentsPage() {
     }, []);
 
     const sortedPlans = useMemo(() => {
-        // 페이지 미학: 월간 먼저, 그 다음 연간
         return [...plans].sort((a, b) =>
             a.period === b.period ? a.amount - b.amount : a.period === 'MONTHLY' ? -1 : 1
         );

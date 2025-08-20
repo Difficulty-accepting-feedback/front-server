@@ -47,7 +47,7 @@ const GROUPS: { key: string; title: string; items: Item[] }[] = [
         title: '설정',
         items: [
             { href: '/me/account', label: '계정 정보', icon: Settings, ready: true },
-            { href: '/me/notifications', label: '알림 설정', icon: Bell, ready: false },
+            { href: '/me/notifications', label: '알림 설정', icon: Bell, ready: true },
         ],
     },
 ]
