@@ -5,7 +5,6 @@ import { useId } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCreateNotice } from '@/hooks/useNotice';
-
 import {
     Form,
     FormField,
@@ -34,11 +33,22 @@ const schema = z.object({
 type FormInput = z.input<typeof schema>;
 type FormOutput = z.output<typeof schema>;
 
-// ===== 3) 컴포넌트 =====
-export default function NoticeCreateForm({ groupId }: { groupId: number }) {
+// ===== 3) 컴포넌트 Props 타입 =====
+interface NoticeCreateFormProps {
+    groupId: number;
+    onSuccess?: () => void;
+    onCancel?: () => void;
+}
+
+// ===== 4) 컴포넌트 =====
+export default function NoticeCreateForm({
+                                             groupId,
+                                             onSuccess,
+                                             onCancel
+                                         }: NoticeCreateFormProps) {
     const formId = useId();
 
-    const form = useForm<FormInput, unknown, FormOutput>({
+    const form = useForm<FormInput, any, FormOutput>({
         resolver: zodResolver(schema),
         defaultValues: {
             groupId, // parameter로 받은 값
@@ -51,8 +61,38 @@ export default function NoticeCreateForm({ groupId }: { groupId: number }) {
     const createMutation = useCreateNotice();
 
     const onSubmit: SubmitHandler<FormOutput> = async (values) => {
-        await createMutation.mutateAsync(values);
-        form.reset({ ...values, content: '', groupId });
+        try {
+            await createMutation.mutateAsync(values);
+
+            // 폼 리셋
+            form.reset({
+                groupId,
+                content: '',
+                isPinned: false
+            });
+
+            // 성공 콜백 실행
+            onSuccess?.();
+        } catch (error) {
+            // 에러는 createMutation.isError로 처리됨
+            console.error('공지사항 생성 실패:', error);
+        }
+    };
+
+    // 취소 처리
+    const handleCancel = () => {
+        form.reset({
+            groupId,
+            content: '',
+            isPinned: false,
+        });
+        onCancel?.();
+    };
+
+    // 내용 지우기
+    const handleClearContent = () => {
+        form.setValue('content', '');
+        form.setFocus('content');
     };
 
     const isSubmitting = createMutation.isPending;
@@ -60,71 +100,125 @@ export default function NoticeCreateForm({ groupId }: { groupId: number }) {
     const isSuccess = createMutation.isSuccess;
 
     return (
-        <section className="rounded-xl border bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Badge className="bg-emerald-600 text-white">공지 생성</Badge>
-                    <h3 className="text-lg font-semibold text-gray-900">그룹 공지 작성</h3>
+        <div className="space-y-4">
+            {/* 헤더 */}
+            <div className="flex items-center space-x-2">
+                <Badge variant="secondary" className="flex items-center space-x-1">
+                    <Sparkles size={12} />
+                    <span>공지 생성</span>
+                </Badge>
+                <div>
+                    <h3 className="text-lg font-medium">그룹 공지 작성</h3>
+                    <p className="text-sm text-gray-600">
+                        명확하고 간결한 공지를 작성해 보세요.
+                    </p>
                 </div>
-                <p className="text-sm text-gray-500">명확하고 간결한 공지를 작성해 보세요.</p>
             </div>
 
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5" noValidate>
-                    <input type="hidden" {...form.register('groupId')} value={groupId} />
+            {/* 에러 메시지 */}
+            {hasError && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                    <p className="text-red-800 text-sm">
+                        공지사항 생성에 실패했습니다. 다시 시도해주세요.
+                    </p>
+                </div>
+            )}
 
-                    {/* content */}
+            {/* 폼 */}
+            <Form {...form}>
+                <form
+                    id={formId}
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-4"
+                >
+                    {/* content 필드 */}
                     <FormField
                         control={form.control}
                         name="content"
                         render={({ field }) => (
-                            <FormItem className="grid gap-2">
-                                <FormLabel className="text-gray-800">공지 내용</FormLabel>
+                            <FormItem>
+                                <FormLabel className="text-sm font-medium">
+                                    공지 내용
+                                </FormLabel>
                                 <FormControl>
-                                    <Textarea rows={6} maxLength={500} placeholder="공지 내용 (10~500자)" {...field} />
+                                    <div className="relative">
+                                        <Textarea
+                                            {...field}
+                                            placeholder="핵심 정보는 첫 문장에 배치하세요."
+                                            className="min-h-[120px] resize-none"
+                                            disabled={isSubmitting}
+                                        />
+                                        <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+                                            {field.value?.length ?? 0}/500
+                                        </div>
+                                    </div>
                                 </FormControl>
-                                <div className="flex items-center justify-between text-xs text-gray-500">
-                                    <span>핵심 정보는 첫 문장에 배치하세요.</span>
-                                    <span>{field.value?.length ?? 0}/500</span>
-                                </div>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    {/* isPinned */}
+                    {/* isPinned 필드 */}
                     <FormField
                         control={form.control}
                         name="isPinned"
                         render={({ field }) => (
-                            <FormItem className="flex items-center justify-between rounded-lg border p-3">
-                                <div className="grid">
-                                    <FormLabel className="text-gray-800">상단 고정</FormLabel>
-                                    <p className="text-xs text-gray-500">체크 시 목록 최상단 노출</p>
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                                <div className="space-y-0.5">
+                                    <FormLabel className="text-sm font-medium">
+                                        상단 고정
+                                    </FormLabel>
+                                    <div className="text-sm text-gray-600">
+                                        체크 시 목록 최상단 노출
+                                    </div>
                                 </div>
                                 <FormControl>
-                                    <Switch checked={!!field.value} onCheckedChange={field.onChange} />
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        disabled={isSubmitting}
+                                    />
                                 </FormControl>
-                                <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    <div className="flex items-center gap-3">
-                        <Button type="submit" disabled={isSubmitting} className="h-11 bg-emerald-700 hover:bg-emerald-800">
-                            {isSubmitting ? '저장 중...' : '공지 생성'}
-                        </Button>
-                        <button
-                            type="button"
-                            onClick={() => form.reset({ ...form.getValues(), content: '' })}
-                            className="text-sm text-gray-600 hover:underline"
-                        >
-                            내용 지우기
-                        </button>
+                    {/* 버튼 그룹 */}
+                    <div className="flex items-center justify-between pt-4">
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleClearContent}
+                                disabled={isSubmitting || !form.getValues('content')}
+                                className="text-sm text-gray-600 hover:underline"
+                            >
+                                내용 지우기
+                            </Button>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            {onCancel && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleCancel}
+                                    disabled={isSubmitting}
+                                >
+                                    취소
+                                </Button>
+                            )}
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting || !form.formState.isValid}
+                            >
+                                {isSubmitting ? '저장 중...' : '공지 생성'}
+                            </Button>
+                        </div>
                     </div>
                 </form>
             </Form>
-        </section>
-
+        </div>
     );
 }
