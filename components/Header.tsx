@@ -129,7 +129,7 @@ export default function Header() {
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
-                                    <Link href="/notifications" className="flex items-center w-full relative">
+                                    <Link href="/me/notifications" className="flex items-center w-full relative">
                                         <Bell className="w-4 h-4 mr-2" />
                                         알림
                                         {unreadCount > 0 && (
@@ -269,7 +269,7 @@ export default function Header() {
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
                                             {/* 경로 통일: /notifications + 실시간 배지 */}
-                                            <Link href="/notifications" className="flex items-center w-full">
+                                            <Link href="/me/notifications" className="flex items-center w-full">
                                                 <Bell className="w-4 h-4 mr-2" />
                                                 알림
                                                 {unreadCount > 0 && (
