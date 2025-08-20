@@ -55,9 +55,9 @@ export default function ShareCreatePage() {
     useEffect(() => {
         if (typeof window === "undefined") return;
 
-        // 세션 스토리지에서 가져오기: 실제 저장 키로 교체 가능
-        const storedBoardId = sessionStorage.getItem("boardId");
-        const storedMemberId = sessionStorage.getItem("memberId");
+        // TODO: 세션 스토리지에서 가져오기
+        const storedBoardId = 1; // sessionStorage.getItem("boardId");
+        const storedMemberId = 1; // sessionStorage.getItem("memberId");
 
         if (storedBoardId) {
             const num = Number(storedBoardId);
@@ -122,7 +122,7 @@ export default function ShareCreatePage() {
         }
         if (!memberId) {
             toast.error(
-                "회원 ID 누락: X-Authorization-Id로 사용할 memberId가 세션에 없습니다. 로그인 후 다시 시도하세요."
+                "회원 ID 누락: 로그인 후 다시 시도하세요."
             );
             return false;
         }
@@ -166,7 +166,6 @@ export default function ShareCreatePage() {
             const res = await fetch(`${BASE_URL}/api/v1/posts/save`, {
                 method: "POST",
                 headers: {
-                    // Content-Type은 자동 설정됩니다.
                     "X-Authorization-Id": String(memberId),
                 },
                 body: formData,

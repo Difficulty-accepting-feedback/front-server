@@ -51,7 +51,7 @@ export default function GroupNavigation({ className = '' }: Props) {
         return [
             { name: 'DASHBOARD', href: `/group/dashboard/${groupId}`, icon: LayoutGrid, ariaLabel: '대시보드' },
             { name: 'NOTICE', href: `/group/notice/${groupId}`, icon: Bell, ariaLabel: '공지사항' },
-            { name: 'SHARE', href: `/group/share/${groupId}`, icon: Share2, ariaLabel: '자료 공유' },
+            { name: 'SHARE', href: `/group/share`, icon: Share2, ariaLabel: '자료 공유' },
             { name: 'MEETING', href: `/create`, icon: Video, ariaLabel: '화상 회의' },
         ];
     }, [groupId]);
