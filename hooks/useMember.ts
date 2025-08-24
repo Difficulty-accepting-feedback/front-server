@@ -11,6 +11,7 @@ export type MemberInfo = {
     address?: string | null
     matchingEnabled?: boolean
     phoneVerified?: boolean
+    totalPoint: number
 }
 
 export function useMember() {

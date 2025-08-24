@@ -39,7 +39,7 @@ const GROUPS: { key: string; title: string; items: Item[] }[] = [
         items: [
             { href: '/me/payment', label: '결제 관리', icon: CreditCard, ready: true },
             { href: '/me/payment/history', label: '결제 내역', icon: ShoppingCart, ready: true },
-            { href: '/me/points', label: '포인트', icon: Coins, ready: false },
+            { href: '/me/points', label: '포인트', icon: Coins, ready: true },
         ],
     },
     {
