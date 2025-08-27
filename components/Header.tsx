@@ -76,7 +76,7 @@ export default function Header() {
 
                 {/* 데스크톱 네비게이션 */}
                 <nav className="hidden md:flex space-x-6 items-center">
-                    <Link href="/categories" className="text-gray-600 hover:text-green-600 transition-colors">
+                    <Link href="/study" className="text-gray-600 hover:text-green-600 transition-colors">
                         스터디
                     </Link>
                     <Link href="/hobby" className="text-gray-600 hover:text-green-600 transition-colors">
