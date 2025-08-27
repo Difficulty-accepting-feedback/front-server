@@ -203,9 +203,6 @@ export default function Header() {
                             <Button asChild variant="outline" className="transition-transform hover:scale-105">
                                 <Link href="/auth/login">로그인</Link>
                             </Button>
-                            <Button className="bg-green-500 hover:bg-green-600 transition-transform hover:scale-105">
-                                회원가입
-                            </Button>
                         </>
                     )}
                 </div>
