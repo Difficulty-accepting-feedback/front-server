@@ -29,8 +29,14 @@ export function useAccomplishments(limit = 3) {
                 // RsData { data: { content: [...] } } 기준
                 const list = body.data?.content ?? []
                 if (mounted) setData(list)
-            } catch (e: any) {
-                if (mounted) setError(e.message ?? 'failed')
+            } catch (e) {
+                if (mounted) {
+                    if (e instanceof Error) {
+                        setError(e.message)
+                    } else {
+                        setError('알 수 없는 오류 발생')
+                    }
+                }
             } finally {
                 if (mounted) setLoading(false)
             }
