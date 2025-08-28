@@ -1,13 +1,15 @@
 // components/Header.tsx
 'use client'
 
-import { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuth } from '@/hooks/useAuth'
+import { useMember } from '@/hooks/useMember' // ✅ myId 가져오기
+import NotePopupWindow from '@/components/notes/NotePopupWindow' // 쪽지 팝업 컴포넌트
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -34,20 +36,34 @@ import {
     ShoppingCart,
     Brain,
     Settings,
+    Mail, // 쪽지 아이콘
 } from 'lucide-react'
 
 // 알림 훅 추가
 import { useUnreadCount } from '@/hooks/useNotifications'
 
-const MEMBER_BASE = 'http://localhost:8080'
+const MEMBER_BASE = process.env.NEXT_PUBLIC_MEMBER_BASE ?? 'http://localhost:8081'
+
+// Memoize NotePopupWindow to avoid unnecessary remounts when Header rerenders
+const MemoNotePopupWindow = React.memo(NotePopupWindow)
 
 export default function Header() {
     const [searchQuery, setSearchQuery] = useState('')
     const { me, loading } = useAuth()
     const isLoggedIn = !!me && !loading
 
+    // 내 회원 정보 (myId 사용)
+    const { data: myInfo } = useMember()
+    const myId = myInfo?.memberId
+
     // 미읽음 카운트(리액트쿼리 캐시 + SSE invalidate)
+    // (현재 useUnreadCount 훅을 알림/쪽지 미읽음으로 함께 사용하고 있음: 필요 시 분리 가능)
     const { data: unreadCount = 0 } = useUnreadCount()
+
+    // 쪽지 팝업 열림 상태
+    const [noteOpen, setNoteOpen] = useState(false)
+    const handleOpenNote = useCallback(() => setNoteOpen(true), [])
+    const handleCloseNote = useCallback(() => setNoteOpen(false), [])
 
     const handleLogout = async () => {
         try {
@@ -120,13 +136,35 @@ export default function Header() {
                                 </div>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-64 p-2">
-                                <DropdownMenuLabel className="flex flex-col items-start gap-2 pb-2">
-                                    <span className="text-xs text-muted-foreground">성실성 점수</span>
-                                    <span className="text-green-600 font-bold text-lg flex items-center gap-1">
-                    <Coins className="w-5 h-5 mr-1" />
-                    10,200<span className="text-xs text-gray-400 ml-1">원</span>
-                  </span>
+                                {/* 성실성 점수 + 쪽지 아이콘(떠있는 창 오픈) */}
+                                <DropdownMenuLabel className="flex items-center justify-between gap-2 pb-2">
+                                    <div className="flex flex-col items-start">
+                                        <span className="text-xs text-muted-foreground">성실성 점수</span>
+                                        <span className="text-green-600 font-bold text-lg flex items-center gap-1">
+                                            <Coins className="w-5 h-5 mr-1" />
+                                            10,200<span className="text-xs text-gray-400 ml-1">원</span>
+                                        </span>
+                                    </div>
+
+                                    {/* 쪽지 버튼: 클릭하면 팝업 열림 */}
+                                    {isLoggedIn && myId ? (
+                                        <button
+                                            type="button"
+                                            onClick={handleOpenNote}
+                                            className="relative p-2 rounded hover:bg-muted outline-none"
+                                            aria-label="쪽지 창 열기"
+                                            title="쪽지"
+                                        >
+                                            <Mail className="w-4 h-4" />
+                                            {unreadCount > 0 && (
+                                                <span className="absolute -top-1 -right-1 rounded-full bg-red-500 text-white text-[10px] leading-none px-1 py-[2px]">
+                                                    {unreadCount}
+                                                </span>
+                                            )}
+                                        </button>
+                                    ) : null}
                                 </DropdownMenuLabel>
+
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
                                     <Link href="/me/notifications" className="flex items-center w-full relative">
@@ -259,9 +297,9 @@ export default function Header() {
                                         <DropdownMenuLabel className="flex flex-col items-start gap-2 pb-2">
                                             <span className="text-xs text-muted-foreground">성실성 점수</span>
                                             <span className="text-green-600 font-bold text-lg flex items-center gap-1">
-                        <Coins className="w-5 h-5 mr-1" />
-                        10,200<span className="text-xs text-gray-400 ml-1">원</span>
-                      </span>
+                                                <Coins className="w-5 h-5 mr-1" />
+                                                10,200<span className="text-xs text-gray-400 ml-1">원</span>
+                                            </span>
                                         </DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
@@ -271,8 +309,8 @@ export default function Header() {
                                                 알림
                                                 {unreadCount > 0 && (
                                                     <span className="ml-2 inline-flex items-center rounded-full bg-red-500 px-2 py-0.5 text-xs font-medium text-white">
-                            {unreadCount}
-                          </span>
+                                                        {unreadCount}
+                                                    </span>
                                                 )}
                                             </Link>
                                         </DropdownMenuItem>
@@ -307,6 +345,10 @@ export default function Header() {
                     </SheetContent>
                 </Sheet>
             </div>
+
+            {isLoggedIn && myId ? (
+                <MemoNotePopupWindow open={noteOpen} onClose={handleCloseNote} myId={myId} />
+            ) : null}
         </header>
     )
 }
