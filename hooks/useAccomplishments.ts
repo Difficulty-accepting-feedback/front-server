@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-const MEMBER_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'
+const MEMBER_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'
 
 export type Accomplished = {
     accomplishedId: number

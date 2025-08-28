@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-const MEMBER_BASE = 'http://localhost:8080'
+const MEMBER_BASE = 'http://localhost:8081'
 
 type MeResp = {
     code: string

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { toast } from 'sonner'
 
-const MEMBER_BASE = 'http://localhost:8080'
+const MEMBER_BASE = 'http://localhost:8081'
 
 declare global {
     interface Window { daum: any }

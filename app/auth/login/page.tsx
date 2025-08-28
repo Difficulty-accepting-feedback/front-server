@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useEffect, useMemo, useState } from 'react'
 
-const MEMBER_BASE = 'http://localhost:8080'
+const MEMBER_BASE = 'http://localhost:8081'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')

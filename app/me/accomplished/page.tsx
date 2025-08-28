@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-const MEMBER_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080'
+const MEMBER_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'
 
 type Accomplished = {
     accomplishedId: number

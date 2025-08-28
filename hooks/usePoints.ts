@@ -1,7 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 
-const MEMBER_BASE = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8080'
+const MEMBER_BASE = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8081'
 
 export type PointHistory = {
     pointHistoryId: number
