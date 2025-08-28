@@ -1,12 +1,13 @@
 'use client';
 
 import {useState, useEffect} from 'react';
-import {getGroups, GroupResponse, Category} from '@/lib/group-api';
+import {getGroups, GroupResponse, Category, SkillTagLabel, PersonalityTagLabel} from '@/lib/mentoring-api';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Search, User, BookOpen} from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const mockMentorImage = '/images/mentor_default.png';
 
@@ -16,6 +17,7 @@ export default function StudyPage() {
     const [error, setError] = useState<string | null>(null);
     const [searchText, setSearchText] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
+    const router = useRouter();
 
     useEffect(() => {
         async function fetchGroupsData() {
@@ -93,6 +95,7 @@ export default function StudyPage() {
                         <SelectContent>
                             <SelectItem value="default">기본순</SelectItem>
                             <SelectItem value="popular">인기순</SelectItem>
+                            <SelectItem value="recent">최신순</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -114,8 +117,15 @@ export default function StudyPage() {
                     ) : (
                         <>
                             {filteredGroups.map((group) => (
-                                <Card key={group.groupId}
-                                      className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-102 border-green-100 hover:border-green-300">
+                                <Card
+                                    onClick={() => router.push(`/mentoring/${group.groupId}`)}
+                                    role="link"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') router.push(`/groups/${group.groupId}`);
+                                    }}
+                                    className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-102 border-green-100 hover:border-green-300"
+                                >
                                     <CardHeader className="p-0">
                                         <div
                                             className="h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
@@ -138,11 +148,11 @@ export default function StudyPage() {
                                         </p>
                                         <div className="flex flex-wrap gap-2 mb-4">
                       <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
-                        #backend
+                        {SkillTagLabel[group.skillTag]}
                       </span>
                                             <span
                                                 className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
-                        #취업
+                        {PersonalityTagLabel[group.personalityTag]}
                       </span>
                                             <span
                                                 className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
@@ -151,10 +161,10 @@ export default function StudyPage() {
                                         </div>
                                         <div className="flex items-center justify-between">
                       <span className="text-green-800 font-bold text-lg">
-                        ₩35,000
+                        {group.amount} 원
                       </span>
                                             <span className="text-green-600 text-sm">
-                        (1시간)
+                        [6주]
                       </span>
                                         </div>
                                     </CardContent>
