@@ -4,13 +4,13 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { useMember } from '@/hooks/useMember'
 import {
-    Home, BookOpen, Palette, Users, LayoutDashboard, Bot,
+    Home, BookOpen, Palette, Users, LayoutDashboard,
     CreditCard, ShoppingCart, Coins, Settings, Bell, ChevronDown, Brain
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import {useAuth} from "@/hooks/useAuth";
 
 type Item = {
     href: string
@@ -54,7 +54,7 @@ const GROUPS: { key: string; title: string; items: Item[] }[] = [
 
 export default function SideNav() {
     const pathname = usePathname()
-    const { data: me } = useMember()
+    const { me } = useAuth()
     const initials = useMemo(() => (me?.nickname?.[0] ?? 'G').toUpperCase(), [me?.nickname])
 
     const [collapsed, setCollapsed] = useState<Record<string, boolean>>({

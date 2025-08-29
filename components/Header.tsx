@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAuth } from '@/hooks/useAuth'
-import { useMember } from '@/hooks/useMember' // ✅ myId 가져오기
 import NotePopupWindow from '@/components/notes/NotePopupWindow' // 쪽지 팝업 컴포넌트
 import {
     DropdownMenu,
@@ -41,6 +40,8 @@ import {
 
 // 알림 훅 추가
 import { useUnreadCount } from '@/hooks/useNotifications'
+// 쪽지 훅 추가
+import { useNoteUnreadCount } from '@/hooks/useNotes'
 
 const MEMBER_BASE = process.env.NEXT_PUBLIC_MEMBER_BASE ?? 'http://localhost:8081'
 
@@ -53,12 +54,12 @@ export default function Header() {
     const isLoggedIn = !!me && !loading
 
     // 내 회원 정보 (myId 사용)
-    const { data: myInfo } = useMember()
-    const myId = myInfo?.memberId
+    const myId = me?.memberId
 
     // 미읽음 카운트(리액트쿼리 캐시 + SSE invalidate)
-    // (현재 useUnreadCount 훅을 알림/쪽지 미읽음으로 함께 사용하고 있음: 필요 시 분리 가능)
-    const { data: unreadCount = 0 } = useUnreadCount()
+    const { data: notifUnread  = 0 } = useUnreadCount()
+
+    const { data: noteUnread = 0 } = useNoteUnreadCount(myId)
 
     // 쪽지 팝업 열림 상태
     const [noteOpen, setNoteOpen] = useState(false)
@@ -71,8 +72,7 @@ export default function Header() {
                 method: 'POST',
                 credentials: 'include',
             })
-        } catch (_) {
-            // noop
+        } catch {
         } finally {
             location.href = '/'
         }
@@ -156,9 +156,9 @@ export default function Header() {
                                             title="쪽지"
                                         >
                                             <Mail className="w-4 h-4" />
-                                            {unreadCount > 0 && (
+                                            {noteUnread  > 0 && (
                                                 <span className="absolute -top-1 -right-1 rounded-full bg-red-500 text-white text-[10px] leading-none px-1 py-[2px]">
-                                                    {unreadCount}
+                                                    {noteUnread }
                                                 </span>
                                             )}
                                         </button>
@@ -170,12 +170,12 @@ export default function Header() {
                                     <Link href="/me/notifications" className="flex items-center w-full relative">
                                         <Bell className="w-4 h-4 mr-2" />
                                         알림
-                                        {unreadCount > 0 && (
+                                        {notifUnread  > 0 && (
                                             <Badge
                                                 variant="destructive"
                                                 className="ml-2 h-4 px-1 flex items-center justify-center"
                                             >
-                                                {unreadCount}
+                                                {notifUnread }
                                             </Badge>
                                         )}
                                     </Link>
@@ -307,9 +307,9 @@ export default function Header() {
                                             <Link href="/me/notifications" className="flex items-center w-full">
                                                 <Bell className="w-4 h-4 mr-2" />
                                                 알림
-                                                {unreadCount > 0 && (
+                                                {notifUnread  > 0 && (
                                                     <span className="ml-2 inline-flex items-center rounded-full bg-red-500 px-2 py-0.5 text-xs font-medium text-white">
-                                                        {unreadCount}
+                                                        {notifUnread }
                                                     </span>
                                                 )}
                                             </Link>

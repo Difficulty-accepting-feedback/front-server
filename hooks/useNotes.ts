@@ -1,3 +1,4 @@
+// hooks/useNotes.ts
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -5,57 +6,33 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 const NOTE_BASE = process.env.NEXT_PUBLIC_NOTE_BASE ?? 'http://localhost:8084'
 
 function buildHeaders(memberId: number): HeadersInit {
-    return {
-        'Content-Type': 'application/json',
-        'X-Authorization-Id': String(memberId),
-    }
+    return { 'Content-Type': 'application/json', 'X-Authorization-Id': String(memberId) }
 }
 
 async function getJSON<T>(path: string, memberId: number): Promise<T> {
-    if (memberId === undefined || memberId === null) {
-        throw new Error('memberId is required')
-    }
-
-    const res = await fetch(`${NOTE_BASE}${path}`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: buildHeaders(memberId),
-    })
+    const res = await fetch(`${NOTE_BASE}${path}`, { method: 'GET', credentials: 'include', headers: buildHeaders(memberId) })
     if (!res.ok) throw new Error(`GET ${path} -> ${res.status}`)
     const body = await res.json().catch(() => null)
     return (body?.data ?? body) as T
 }
 
 async function postVoid(path: string, memberId: number) {
-    if (memberId === undefined || memberId === null) {
-        throw new Error('memberId is required')
-    }
-
-    const res = await fetch(`${NOTE_BASE}${path}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: buildHeaders(memberId),
-    })
+    const res = await fetch(`${NOTE_BASE}${path}`, { method: 'POST', credentials: 'include', headers: buildHeaders(memberId) })
     if (!res.ok) throw new Error(`POST ${path} -> ${res.status}`)
 }
 
 async function delVoid(path: string, memberId: number) {
-    if (memberId === undefined || memberId === null) {
-        throw new Error('memberId is required')
-    }
-
-    const res = await fetch(`${NOTE_BASE}${path}`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: buildHeaders(memberId),
-    })
+    const res = await fetch(`${NOTE_BASE}${path}`, { method: 'DELETE', credentials: 'include', headers: buildHeaders(memberId) })
     if (!res.ok) throw new Error(`DELETE ${path} -> ${res.status}`)
 }
 
+/* ---------- 타입: 닉네임 포함 ---------- */
 export type NoteItem = {
     noteId: number
     senderId: number
     recipientId: number
+    senderNickname: string
+    recipientNickname: string
     content: string
     createdAt: string
     isRead: boolean
@@ -69,8 +46,9 @@ export type NotePageResponse = {
     content: NoteItem[]
 }
 
+/* ---------- 전송 DTO: recipientNickname 으로 전송 ---------- */
 type SendNoteRequest = {
-    recipientId: number
+    recipientNickname: string
     content: string
 }
 
@@ -85,32 +63,26 @@ export function useNoteUnreadCount(memberId?: number) {
 
 export function useNoteInbox(memberId?: number, page = 0, size = 3) {
     const qc = useQueryClient()
-
     return useQuery({
         queryKey: ['notes', 'inbox', memberId, page, size],
         queryFn: () => getJSON<NotePageResponse>(`/api/notes/inbox?page=${page}&size=${size}`, memberId as number),
         enabled: !!memberId,
         placeholderData: () => {
-            if (!memberId) return undefined
-            if (page <= 0) return undefined
-            const prev = qc.getQueryData<NotePageResponse>(['notes', 'inbox', memberId, page - 1, size])
-            return prev ?? undefined
+            if (!memberId || page <= 0) return undefined
+            return qc.getQueryData<NotePageResponse>(['notes', 'inbox', memberId, page - 1, size]) ?? undefined
         },
     })
 }
 
 export function useNoteOutbox(memberId?: number, page = 0, size = 3) {
     const qc = useQueryClient()
-
     return useQuery({
         queryKey: ['notes', 'outbox', memberId, page, size],
         queryFn: () => getJSON<NotePageResponse>(`/api/notes/outbox?page=${page}&size=${size}`, memberId as number),
         enabled: !!memberId,
         placeholderData: () => {
-            if (!memberId) return undefined
-            if (page <= 0) return undefined
-            const prev = qc.getQueryData<NotePageResponse>(['notes', 'outbox', memberId, page - 1, size])
-            return prev ?? undefined
+            if (!memberId || page <= 0) return undefined
+            return qc.getQueryData<NotePageResponse>(['notes', 'outbox', memberId, page - 1, size]) ?? undefined
         },
     })
 }
@@ -120,12 +92,8 @@ export function useMarkNoteRead(memberId?: number) {
     return useMutation({
         mutationFn: (noteId: number) => postVoid(`/api/notes/${noteId}/read`, memberId as number),
         onSuccess: () => {
-            // memberId에 해당하는 notes 관련 캐시만 무효화
             qc.invalidateQueries({
-                predicate: (query) => {
-                    const key = query.queryKey
-                    return Array.isArray(key) && key[0] === 'notes' && key.includes(memberId as number)
-                },
+                predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'notes' && q.queryKey.includes(memberId as number),
             })
             qc.invalidateQueries({ queryKey: ['notes', 'unread-count', memberId] })
         },
@@ -138,10 +106,7 @@ export function useDeleteNote(memberId?: number) {
         mutationFn: (noteId: number) => delVoid(`/api/notes/${noteId}`, memberId as number),
         onSuccess: () => {
             qc.invalidateQueries({
-                predicate: (query) => {
-                    const key = query.queryKey
-                    return Array.isArray(key) && key[0] === 'notes' && key.includes(memberId as number)
-                },
+                predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'notes' && q.queryKey.includes(memberId as number),
             })
             qc.invalidateQueries({ queryKey: ['notes', 'unread-count', memberId] })
         },
@@ -149,22 +114,10 @@ export function useDeleteNote(memberId?: number) {
 }
 
 async function postJSON<T>(path: string, memberId: number, body: unknown): Promise<T> {
-    if (memberId === undefined || memberId === null) {
-        throw new Error('memberId is required')
-    }
-
-    const res = await fetch(`${NOTE_BASE}${path}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: buildHeaders(memberId),
-        body: JSON.stringify(body),
-    })
+    const res = await fetch(`${NOTE_BASE}${path}`, { method: 'POST', credentials: 'include', headers: buildHeaders(memberId), body: JSON.stringify(body) })
     const text = await res.text()
     const json = text ? JSON.parse(text) : null
-    if (!res.ok) {
-        const msg = json?.message ?? `HTTP ${res.status}`
-        throw new Error(msg)
-    }
+    if (!res.ok) throw new Error(json?.message ?? `HTTP ${res.status}`)
     return (json?.data ?? json) as T
 }
 
@@ -174,11 +127,9 @@ export function useSendNote(memberId?: number) {
         mutationFn: (dto: SendNoteRequest) => postJSON<unknown>('/api/notes', memberId as number, dto),
         onSuccess: () => {
             qc.invalidateQueries({
-                predicate: (query) => {
-                    const key = query.queryKey
-                    return Array.isArray(key) && key[0] === 'notes' && key.includes(memberId as number)
-                },
+                predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'notes' && q.queryKey.includes(memberId as number),
             })
+            qc.invalidateQueries({ queryKey: ['notes', 'unread-count', memberId] })
         },
     })
 }
