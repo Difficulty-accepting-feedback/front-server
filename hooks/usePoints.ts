@@ -1,7 +1,6 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
-
-const MEMBER_BASE = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8081'
+import { MEMBER_BASE_URL } from '@/lib/env'
 
 export type PointHistory = {
     pointHistoryId: number
@@ -73,7 +72,7 @@ async function fetchPoints(params: {
     if (startAt) usp.set('startAt', startAt)
     if (endAt) usp.set('endAt', endAt)
 
-    const res = await fetch(`${MEMBER_BASE}/api/points/me?${usp.toString()}`, {
+    const res = await fetch(`${MEMBER_BASE_URL}/api/points/me?${usp.toString()}`, {
         credentials: 'include',
     })
 

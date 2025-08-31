@@ -1,4 +1,3 @@
-// components/notes/NotePopupWindow.tsx
 'use client'
 
 import { useEffect } from 'react'

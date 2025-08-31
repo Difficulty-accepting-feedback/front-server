@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Download, AlertCircle } from "lucide-react"; // 아이콘 추가
 import GroupNavigation from "@/components/navigation/GroupNavigation";
+import { STUDY_BASE_URL } from '@/lib/env';
 
 // API 응답 타입
 type RsData<T> = {
@@ -39,7 +40,6 @@ type PostResponse = {
 };
 
 export default function ShareDetailPage() {
-    const BASE_URL = "http://localhost:8085";
 
     const params = useParams<{ postId: string }>();
     const postId = params?.postId;
@@ -59,7 +59,7 @@ export default function ShareDetailPage() {
             setError(null);
             try {
                 const res = await axios.get<RsData<PostResponse>>(
-                    `${BASE_URL}/api/v1/posts/${postId}`,
+                    `${STUDY_BASE_URL}/api/v1/posts/${postId}`,
                     {
                         headers: {
                             "X-Authorization-Id": authMemberId,
@@ -101,7 +101,7 @@ export default function ShareDetailPage() {
         const url =
             file.path.startsWith("http://") || file.path.startsWith("https://")
                 ? file.path
-                : `${BASE_URL}${file.path}`;
+                : `${STUDY_BASE_URL}${file.path}`;
 
         try {
             const response = await axios.get(url, {

@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
-const MEMBER_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'
+import { MEMBER_BASE_URL } from '@/lib/env'
 
 export type Accomplished = {
     accomplishedId: number
@@ -21,7 +20,7 @@ export function useAccomplishments(limit = 3) {
         ;(async () => {
             try {
                 setLoading(true)
-                const res = await fetch(`${MEMBER_BASE}/api/accomplished/me?page=0&size=${limit}`, {
+                const res = await fetch(`${MEMBER_BASE_URL}/api/accomplished/me?page=0&size=${limit}`, {
                     credentials: 'include',
                 })
                 if (!res.ok) throw new Error(`HTTP ${res.status}`)

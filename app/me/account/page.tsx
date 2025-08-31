@@ -8,8 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { toast } from 'sonner'
-
-const MEMBER_BASE = 'http://localhost:8081'
+import { MEMBER_BASE_URL } from '@/lib/env'
 
 declare global {
     interface Window { daum: any }
@@ -66,7 +65,7 @@ export default function AccountPage() {
         try {
             setSaving(true)
             // 1) 기본 프로필/주소 저장 (표시용 address)
-            const res = await fetch(`${MEMBER_BASE}/api/members/me`, {
+            const res = await fetch(`${MEMBER_BASE_URL}/api/members/me`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -80,7 +79,7 @@ export default function AccountPage() {
 
             // 2) 좌표 업서트 트리거 (코드 우선, 없으면 텍스트)
             if ((form.regionLabel ?? form.address)?.trim()) {
-                const geo = await fetch(`${MEMBER_BASE}/api/members/me/region`, {
+                const geo = await fetch(`${MEMBER_BASE_URL}/api/members/me/region`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
@@ -103,7 +102,7 @@ export default function AccountPage() {
     const onToggleMatching = async (next: boolean) => {
         setForm((p) => ({ ...p, matchingEnabled: next }))
         try {
-            const res = await fetch(`${MEMBER_BASE}/api/members/me/matching`, {
+            const res = await fetch(`${MEMBER_BASE_URL}/api/members/me/matching`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -120,7 +119,7 @@ export default function AccountPage() {
     const onWithdraw = async () => {
         if (!confirm('정말 탈퇴하시겠어요? 복구가 불가합니다.')) return
         try {
-            const res = await fetch(`${MEMBER_BASE}/api/members/withdraw`, {
+            const res = await fetch(`${MEMBER_BASE_URL}/api/members/withdraw`, {
                 method: 'DELETE',
                 credentials: 'include',
             })

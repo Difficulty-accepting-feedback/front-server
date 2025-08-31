@@ -1,3 +1,5 @@
+import { STUDY_BASE_URL } from '@/lib/env'
+
 export enum Category {
     STUDY = 'STUDY',
     HOBBY = 'HOBBY',
@@ -191,10 +193,8 @@ interface RsData<T> {
     data: T;
 }
 
-const BASE_URL = 'http://localhost:8085';
-
 export async function getGroups(category: Category): Promise<GroupResponse[]> {
-    const res = await fetch(`${BASE_URL}/api/v1/groups/MENTORING`, {
+    const res = await fetch(`${STUDY_BASE_URL}/api/v1/groups/MENTORING`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ export async function getGroups(category: Category): Promise<GroupResponse[]> {
 
 // 그룹 상세 - 그룹 ID 기반
 export async function getGroupDetail(groupId: number): Promise<GroupDetailResponse> {
-    const res = await fetch(`${BASE_URL}/api/v1/groups/MENTORING/${groupId}`, {
+    const res = await fetch(`${STUDY_BASE_URL}/api/v1/groups/MENTORING/${groupId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

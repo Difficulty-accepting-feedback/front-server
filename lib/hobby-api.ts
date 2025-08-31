@@ -1,3 +1,5 @@
+import { STUDY_BASE_URL } from '@/lib/env'
+
 export enum Category {
     STUDY = 'STUDY',
     HOBBY = 'HOBBY',
@@ -191,10 +193,8 @@ interface RsData<T> {
     data: T;
 }
 
-const BASE_URL = 'http://localhost:8085';
-
 export async function getGroups(category: Category): Promise<GroupResponse[]> {
-    const res = await fetch(`${BASE_URL}/api/v1/groups/HOBBY`, {
+    const res = await fetch(`${STUDY_BASE_URL}/api/v1/groups/HOBBY`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

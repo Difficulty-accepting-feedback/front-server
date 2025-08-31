@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Loader2, Clock, Sprout, Calendar, MapPin, Pencil, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { MATCHING_BASE_URL } from '@/lib/env'
 
 // Enum 타입 정의
 enum Category { STUDY = 'STUDY', HOBBY = 'HOBBY', MENTORING = 'MENTORING' }
@@ -65,7 +66,6 @@ const dummyMatchings: MatchingResponse[] = [
 ]
 
 export default function MatchingCheck() {
-    const DEV_BASE_URL = "http://localhost:8080"
     const [category, setCategory] = useState<Category>(Category.STUDY)
     const [matchings, setMatchings] = useState<MatchingResponse[]>(dummyMatchings) // 초기 더미 데이터 설정
     const [loading, setLoading] = useState(false)
@@ -79,7 +79,7 @@ export default function MatchingCheck() {
         const fetchMatchings = async () => {
             setLoading(true)
             try {
-                const response = await fetch(`${DEV_BASE_URL}/api/matching/check?category=${category}`, {
+                const response = await fetch(`${MATCHING_BASE_URL}/api/matching/check?category=${category}`, {
                     method: 'GET',
                     headers: {
                         'X-Authorization-Id': memberId.toString(),
@@ -127,7 +127,7 @@ export default function MatchingCheck() {
 
         setLoading(true)
         try {
-            const response = await fetch(`${DEV_BASE_URL}/api/matching/update/${selectedMatching.id}`, {
+            const response = await fetch(`${MATCHING_BASE_URL}/api/matching/update/${selectedMatching.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editedData)
@@ -137,7 +137,7 @@ export default function MatchingCheck() {
                 toast.success('매칭 정보가 수정되었습니다!')
                 setIsModalOpen(false)
                 // 목록 새로고침 (재조회)
-                const refreshResponse = await fetch(`${DEV_BASE_URL}/api/matching/check?category=${category}`, {
+                const refreshResponse = await fetch(`${MATCHING_BASE_URL}/api/matching/check?category=${category}`, {
                     method: 'GET',
                     headers: {
                         'X-Authorization-Id': memberId.toString(),

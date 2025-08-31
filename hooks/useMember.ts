@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
-const MEMBER_BASE = 'http://localhost:8081'
+import { MEMBER_BASE_URL } from '@/lib/env'
 
 export type MemberInfo = {
     memberId: number
@@ -24,12 +23,11 @@ export function useMember() {
         ;(async () => {
             try {
                 setLoading(true)
-                const res = await fetch(`${MEMBER_BASE}/api/members/me`, {
+                const res = await fetch(`${MEMBER_BASE_URL}/api/members/me`, {
                     credentials: 'include',
                 })
                 if (!res.ok) throw new Error(`HTTP ${res.status}`)
                 const body = await res.json()
-                // 백엔드 응답 래퍼 RsData { data: {...} } 기준
                 const info = (body.data ?? body) as MemberInfo
                 if (mounted) setData(info)
             } catch (e: any) {

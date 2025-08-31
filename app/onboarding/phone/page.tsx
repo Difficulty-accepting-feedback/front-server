@@ -7,8 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { Phone, ShieldCheck, TimerReset } from 'lucide-react'
-
-const MEMBER_BASE = 'http://localhost:8080'
+import { MEMBER_BASE_URL } from '@/lib/env'
 
 export default function PhoneOnboarding() {
     const router = useRouter()
@@ -26,7 +25,7 @@ export default function PhoneOnboarding() {
         }
         setLoadingReq(true)
         try {
-            const res = await fetch(`${MEMBER_BASE}/api/verification/request`, {
+            const res = await fetch(`${MEMBER_BASE_URL}/api/verification/request`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
                 credentials: 'include',
@@ -50,7 +49,7 @@ export default function PhoneOnboarding() {
         }
         setLoadingVerify(true)
         try {
-            const res = await fetch(`${MEMBER_BASE}/api/verification/verify`, {
+            const res = await fetch(`${MEMBER_BASE_URL}/api/verification/verify`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
                 credentials: 'include',

@@ -19,12 +19,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import GroupNavigation from "@/components/navigation/GroupNavigation";
+import { STUDY_BASE_URL } from '@/lib/env';
 
 // sonner
 import { Toaster, toast } from "sonner";
 
 // API 서버 기본 주소
-const BASE_URL = "http://localhost:8085";
 
 // 유틸: 파일 크기 포맷터
 function formatBytes(bytes: number) {
@@ -163,7 +163,7 @@ export default function ShareCreatePage() {
                 });
             }
 
-            const res = await fetch(`${BASE_URL}/api/v1/posts/save`, {
+            const res = await fetch(`${STUDY_BASE_URL}/api/v1/posts/save`, {
                 method: "POST",
                 headers: {
                     "X-Authorization-Id": String(memberId),
