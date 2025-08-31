@@ -57,7 +57,7 @@ export default function PhoneOnboarding() {
             })
             if (!res.ok) throw new Error(await res.text())
             toast.success('인증이 완료되었습니다!')
-            router.replace('/dashboard')
+            router.replace('/')
         } catch (e: any) {
             toast.error('인증 실패', { description: e?.message ?? '코드를 확인하고 다시 시도해 주세요.' })
         } finally {
