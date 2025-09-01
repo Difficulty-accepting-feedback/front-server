@@ -7,8 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { Phone, ShieldCheck, TimerReset } from 'lucide-react'
-
-const MEMBER_BASE = 'http://localhost:8080'
+import { MEMBER_BASE_URL } from '@/lib/env'
 
 export default function PhoneOnboarding() {
     const router = useRouter()
@@ -26,7 +25,7 @@ export default function PhoneOnboarding() {
         }
         setLoadingReq(true)
         try {
-            const res = await fetch(`${MEMBER_BASE}/api/verification/request`, {
+            const res = await fetch(`${MEMBER_BASE_URL}/api/verification/request`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
                 credentials: 'include',
@@ -50,7 +49,7 @@ export default function PhoneOnboarding() {
         }
         setLoadingVerify(true)
         try {
-            const res = await fetch(`${MEMBER_BASE}/api/verification/verify`, {
+            const res = await fetch(`${MEMBER_BASE_URL}/api/verification/verify`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
                 credentials: 'include',
@@ -58,7 +57,7 @@ export default function PhoneOnboarding() {
             })
             if (!res.ok) throw new Error(await res.text())
             toast.success('인증이 완료되었습니다!')
-            router.replace('/dashboard')
+            router.replace('/')
         } catch (e: any) {
             toast.error('인증 실패', { description: e?.message ?? '코드를 확인하고 다시 시도해 주세요.' })
         } finally {

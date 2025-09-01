@@ -12,7 +12,6 @@ function getErrorMessage(e: unknown) {
     try { return JSON.stringify(e); } catch { return '알 수 없는 오류가 발생했습니다.'; }
 }
 
-// ✅ 반드시 default export 컴포넌트여야 함
 export default function Page() {
     const router = useRouter();
     const sp = useSearchParams();

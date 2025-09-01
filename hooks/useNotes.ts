@@ -1,28 +1,26 @@
-// hooks/useNotes.ts
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-
-const NOTE_BASE = process.env.NEXT_PUBLIC_NOTE_BASE ?? 'http://localhost:8084'
+import { NOTIFICATION_BASE_URL } from '@/lib/env'
 
 function buildHeaders(memberId: number): HeadersInit {
     return { 'Content-Type': 'application/json', 'X-Authorization-Id': String(memberId) }
 }
 
 async function getJSON<T>(path: string, memberId: number): Promise<T> {
-    const res = await fetch(`${NOTE_BASE}${path}`, { method: 'GET', credentials: 'include', headers: buildHeaders(memberId) })
+    const res = await fetch(`${NOTIFICATION_BASE_URL}${path}`, { method: 'GET', credentials: 'include', headers: buildHeaders(memberId) })
     if (!res.ok) throw new Error(`GET ${path} -> ${res.status}`)
     const body = await res.json().catch(() => null)
     return (body?.data ?? body) as T
 }
 
 async function postVoid(path: string, memberId: number) {
-    const res = await fetch(`${NOTE_BASE}${path}`, { method: 'POST', credentials: 'include', headers: buildHeaders(memberId) })
+    const res = await fetch(`${NOTIFICATION_BASE_URL}${path}`, { method: 'POST', credentials: 'include', headers: buildHeaders(memberId) })
     if (!res.ok) throw new Error(`POST ${path} -> ${res.status}`)
 }
 
 async function delVoid(path: string, memberId: number) {
-    const res = await fetch(`${NOTE_BASE}${path}`, { method: 'DELETE', credentials: 'include', headers: buildHeaders(memberId) })
+    const res = await fetch(`${NOTIFICATION_BASE_URL}${path}`, { method: 'DELETE', credentials: 'include', headers: buildHeaders(memberId) })
     if (!res.ok) throw new Error(`DELETE ${path} -> ${res.status}`)
 }
 
@@ -114,7 +112,7 @@ export function useDeleteNote(memberId?: number) {
 }
 
 async function postJSON<T>(path: string, memberId: number, body: unknown): Promise<T> {
-    const res = await fetch(`${NOTE_BASE}${path}`, { method: 'POST', credentials: 'include', headers: buildHeaders(memberId), body: JSON.stringify(body) })
+    const res = await fetch(`${NOTIFICATION_BASE_URL}${path}`, { method: 'POST', credentials: 'include', headers: buildHeaders(memberId), body: JSON.stringify(body) })
     const text = await res.text()
     const json = text ? JSON.parse(text) : null
     if (!res.ok) throw new Error(json?.message ?? `HTTP ${res.status}`)

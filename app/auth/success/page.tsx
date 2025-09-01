@@ -16,7 +16,7 @@ export default function AuthSuccess() {
         }
         // 분기 이동
         if (step === 'enter-phone') router.replace('/onboarding/phone')
-        else router.replace('/dashboard')
+        else router.replace('/')
     }, [provider, step, router])
 
     return (

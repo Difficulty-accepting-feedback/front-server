@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Users, Clock, Sprout, Calendar, MapPin, Pencil, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
+import { MATCHING_BASE_URL } from '@/lib/env'
 
 // Enum 타입 정의
 enum Category { STUDY = 'STUDY', HOBBY = 'HOBBY', MENTORING = 'MENTORING' }
@@ -22,8 +23,6 @@ enum Level { SEED = 'SEED', SEEDLING = 'SEEDLING', SAPLING = 'SAPLING', BLOOMING
 enum Age { TEENS = 'TEENS', TWENTIES = 'TWENTIES', THIRTIES = 'THIRTIES', FORTIES = 'FORTIES', FIFTIES = 'FIFTIES', SIXTIES = 'SIXTIES', NONE = 'NONE' }
 
 export default function CreateMatching() {
-    const DEV_BASE_URL = "http://localhost:8080"
-
     const [swiper, setSwiper] = useState<any>(null)
     const [activeIndex, setActiveIndex] = useState(0)
     const [formData, setFormData] = useState({
@@ -46,7 +45,7 @@ export default function CreateMatching() {
 
     const handleSubmit = async () => {
         try {
-            const response = await fetch(`${DEV_BASE_URL}/api/matching/save`, {
+            const response = await fetch(`${MATCHING_BASE_URL}/api/matching/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)

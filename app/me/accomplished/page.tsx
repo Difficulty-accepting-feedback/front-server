@@ -5,8 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-const MEMBER_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'
+import { MEMBER_BASE_URL } from '@/lib/env'
 
 type Accomplished = {
     accomplishedId: number
@@ -33,7 +32,7 @@ export default function AccomplishedPage() {
         ;(async () => {
             try {
                 setLoading(true)
-                const res = await fetch(`${MEMBER_BASE}/api/accomplished/me?page=${page}&size=10`, {
+                const res = await fetch(`${MEMBER_BASE_URL}/api/accomplished/me?page=${page}&size=10`, {
                     credentials: 'include',
                 })
                 if (!res.ok) throw new Error(`HTTP ${res.status}`)

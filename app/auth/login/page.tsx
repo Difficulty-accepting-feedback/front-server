@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useEffect, useMemo, useState } from 'react'
+import { MEMBER_BASE_URL } from '@/lib/env'
 
-const MEMBER_BASE = 'http://localhost:8081'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -27,7 +27,7 @@ export default function LoginPage() {
     }, [lastProvider])
 
     const go = (p: 'google' | 'kakao' | 'naver') => {
-        window.location.href = `${MEMBER_BASE}/oauth2/authorization/${p}`
+        window.location.href = `${MEMBER_BASE_URL}/oauth2/authorization/${p}`
     }
 
     return (

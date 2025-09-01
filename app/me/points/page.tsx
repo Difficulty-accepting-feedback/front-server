@@ -35,11 +35,8 @@ export default function PointsPage() {
 
     // A안: 현재 보유 포인트는 Member.totalPoint에서 읽음
     const { data: me } = useMember()
-    // ✅ useMember의 MemberInfo 타입에 totalPoint?: number 추가 권장
     const myTotalPoint = me?.totalPoint ?? 0
 
-    // ✅ data 기본값으로 EMPTY_PAGE 사용 → content/totalElements 안전 접근
-    // ✅ isLoading/isError에 기본값을 부여해 TS2322 방지(혹시 라이브러리 타입 변화 대비)
     const {
         data = EMPTY_PAGE,
         isLoading = false,

@@ -4,18 +4,18 @@ import { useState, useEffect } from 'react';
 import { RsData, PostSimpleResponse } from '@/lib/post-api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import GroupNavigation from "@/components/navigation/GroupNavigation";
+import { STUDY_BASE_URL } from '@/lib/env';
 
 export default function PostListPage() {
     const [posts, setPosts] = useState<PostSimpleResponse[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const BASE_URL = 'http://localhost:8085';
     const BOARD_ID = 1;
 
     useEffect(() => {
         async function fetchPosts() {
             try {
-                const res = await fetch(`${BASE_URL}/api/v1/posts/list?boardId=${BOARD_ID}`, {
+                const res = await fetch(`${STUDY_BASE_URL}/api/v1/posts/list?boardId=${BOARD_ID}`, {
                     method: 'GET',
                     headers: {
                         'X-Authorization-Id': `12`,

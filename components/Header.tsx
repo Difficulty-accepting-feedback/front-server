@@ -37,13 +37,12 @@ import {
     Settings,
     Mail, // 쪽지 아이콘
 } from 'lucide-react'
+import { MEMBER_BASE_URL } from '@/lib/env'
 
 // 알림 훅 추가
 import { useUnreadCount } from '@/hooks/useNotifications'
 // 쪽지 훅 추가
 import { useNoteUnreadCount } from '@/hooks/useNotes'
-
-const MEMBER_BASE = process.env.NEXT_PUBLIC_MEMBER_BASE ?? 'http://localhost:8081'
 
 // Memoize NotePopupWindow to avoid unnecessary remounts when Header rerenders
 const MemoNotePopupWindow = React.memo(NotePopupWindow)
@@ -68,7 +67,7 @@ export default function Header() {
 
     const handleLogout = async () => {
         try {
-            await fetch(`${MEMBER_BASE}/api/members/logout`, {
+            await fetch(`${MEMBER_BASE_URL}/api/members/logout`, {
                 method: 'POST',
                 credentials: 'include',
             })
