@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAccomplishments } from '@/hooks/useAccomplishments'
 import { Trophy } from 'lucide-react'
+import QnaPreviewCard from '@/components/dashboard/QnaPreviewCard'
 
 export default function MeHomePage() {
     const { data: accomplishments, loading: loadingAch } = useAccomplishments(3)
@@ -69,16 +70,8 @@ export default function MeHomePage() {
                 </Card>
 
                 {/* 1:1 문의 */}
-                <Card className="bg-white/80 dark:bg-gray-800/80">
-                    <CardHeader>
-                        <CardTitle className="text-lg">나의 1:1 문의 내역</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="rounded-xl border border-emerald-100 p-6 text-center text-sm text-muted-foreground">
-                            최근 3건 표시 (연동 대기)
-                        </div>
-                    </CardContent>
-                </Card>
+                {/* 1:1 문의 프리뷰 카드 (최근 3건) */}
+                <QnaPreviewCard />
             </div>
 
             {/* 스터디 / 취미 */}
