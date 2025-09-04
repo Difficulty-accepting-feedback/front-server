@@ -21,3 +21,22 @@ export type NoticeUpdateRequest = {
     content: string; // 10~500자
     isPinned: boolean;
 };
+
+export type Notice = {
+    noticeId: number;
+    title: string;
+    content: string;
+    pinned: boolean;
+    createdAt: string;
+};
+
+export type PageResp<T> = {
+    content: T[];
+    pageable: any;
+    totalPages: number;
+    totalElements: number;
+    size: number;
+    number: number;
+    first: boolean;
+    last: boolean;
+};
