@@ -9,9 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useGrowNoticeAdminActions, useGrowNoticeDetail } from '@/hooks/GrowNotice';
 import { useIsAdminProbe } from '@/hooks/useQna';
-import {
-    Pin, PinOff, Pencil, Trash2, Check, X, ArrowLeft, CalendarDays,
-} from 'lucide-react';
+import { Pin, PinOff, Pencil, Trash2, Check, X, ArrowLeft, CalendarDays } from 'lucide-react';
 
 export default function NoticeDetailPage() {
     const params = useParams<{ id: string }>();
@@ -53,35 +51,43 @@ export default function NoticeDetailPage() {
             { onSuccess: () => setEditing(false) }
         );
     };
-    const onCancel = () => { setTitleDraft(notice.title); setContentDraft(notice.content); setEditing(false); };
+    const onCancel = () => {
+        setTitleDraft(notice.title);
+        setContentDraft(notice.content);
+        setEditing(false);
+    };
     const onDelete = () => {
-        if (confirm('정말 삭제할까요?')) delMut.mutate(notice.noticeId, { onSuccess: () => router.push('/notices') });
+        if (confirm('정말 삭제할까요?')) {
+            delMut.mutate(notice.noticeId, { onSuccess: () => router.push('/notices') });
+        }
     };
 
     return (
         <div className="min-h-[100dvh] bg-gradient-to-br from-emerald-50 via-teal-50 to-green-100">
             <div className="max-w-5xl mx-auto px-4 py-12">
-                {/* 남는 높이까지 채우기 */}
                 <div className="min-h-[calc(100dvh-8rem)] flex flex-col">
-                    {/* 상단 내비 */}
                     <div className="mb-6 flex items-center justify-between">
                         <div className="flex items-center gap-2 text-emerald-800">
-                            <Link href="/notices" className="inline-flex items-center hover:underline underline-offset-4">
+                            <Link
+                                href="/notices"
+                                className="inline-flex items-center hover:underline underline-offset-4"
+                            >
                                 <ArrowLeft className="h-4 w-4 mr-1" />
                                 공지사항
                             </Link>
                             <span className="opacity-60">/</span>
                             <span className="opacity-80 truncate max-w-[60vw]">{notice.title}</span>
                         </div>
-                        <Link href="/notices" className="text-emerald-700 hover:text-emerald-900 underline underline-offset-4">
+                        <Link
+                            href="/notices"
+                            className="text-emerald-700 hover:text-emerald-900 underline underline-offset-4"
+                        >
                             목록으로
                         </Link>
                     </div>
 
-                    {/* 단일 카드가 화면을 채우도록 */}
-                    <Card className="border-emerald-200 bg-white/80 shadow-sm min-h-[70dvh]">
-                        <CardContent className="p-5 h-full flex flex-col">
-                            {/* 헤더(제목/메타/아이콘) */}
+                    <Card className="border-emerald-200 bg-white/80 shadow-sm">
+                        <CardContent className="p-5 flex flex-col">
                             <div className="flex items-start gap-3">
                                 <div className="flex-1">
                                     {editing ? (
@@ -117,14 +123,35 @@ export default function NoticeDetailPage() {
                                                     variant="ghost"
                                                     title={notice.pinned ? '핀 해제' : '핀 고정'}
                                                     aria-label={notice.pinned ? '핀 해제' : '핀 고정'}
-                                                    onClick={() => pinMut.mutate({ id: notice.noticeId, pinned: !notice.pinned })}
+                                                    onClick={() =>
+                                                        pinMut.mutate({
+                                                            id: notice.noticeId,
+                                                            pinned: !notice.pinned,
+                                                        })
+                                                    }
                                                 >
-                                                    {notice.pinned ? <PinOff className="h-5 w-5" /> : <Pin className="h-5 w-5" />}
+                                                    {notice.pinned ? (
+                                                        <PinOff className="h-5 w-5" />
+                                                    ) : (
+                                                        <Pin className="h-5 w-5" />
+                                                    )}
                                                 </Button>
-                                                <Button size="icon" variant="ghost" title="수정" aria-label="수정" onClick={() => setEditing(true)}>
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    title="수정"
+                                                    aria-label="수정"
+                                                    onClick={() => setEditing(true)}
+                                                >
                                                     <Pencil className="h-5 w-5" />
                                                 </Button>
-                                                <Button size="icon" variant="ghost" title="삭제" aria-label="삭제" onClick={onDelete}>
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    title="삭제"
+                                                    aria-label="삭제"
+                                                    onClick={onDelete}
+                                                >
                                                     <Trash2 className="h-5 w-5 text-red-600" />
                                                 </Button>
                                             </>
@@ -139,7 +166,13 @@ export default function NoticeDetailPage() {
                                                 >
                                                     <Check className="h-5 w-5" />
                                                 </Button>
-                                                <Button size="icon" variant="outline" title="취소" aria-label="취소" onClick={onCancel}>
+                                                <Button
+                                                    size="icon"
+                                                    variant="outline"
+                                                    title="취소"
+                                                    aria-label="취소"
+                                                    onClick={onCancel}
+                                                >
                                                     <X className="h-5 w-5" />
                                                 </Button>
                                             </>
@@ -148,20 +181,18 @@ export default function NoticeDetailPage() {
                                 ) : null}
                             </div>
 
-                            {/* 구분선 */}
                             <div className="my-4 h-px bg-emerald-100" />
 
-                            {/* 본문이 남은 높이를 채우도록 */}
-                            <div className="flex-1">
+                            <div>
                                 {editing ? (
                                     <Textarea
                                         value={contentDraft}
                                         onChange={(e) => setContentDraft(e.target.value)}
                                         placeholder="내용을 입력하세요"
-                                        className="h-full min-h-[270px] bg-white border-emerald-200"
+                                        className="w-full min-h-[270px] resize-none bg-white border-emerald-200"
                                     />
                                 ) : (
-                                    <div className="prose prose-emerald max-w-none whitespace-pre-wrap leading-7 min-h-[270px]">
+                                    <div className="min-h-[270px] prose prose-emerald max-w-none whitespace-pre-wrap leading-7">
                                         {notice.content}
                                     </div>
                                 )}
