@@ -1,6 +1,6 @@
 import { NOTIFICATION_BASE_URL } from '@/lib/env';
 
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 const DEFAULT_MEMBER_ID = '2'; // 로컬 직결 테스트용 기본값 (게이트웨이 도입 전)
 
