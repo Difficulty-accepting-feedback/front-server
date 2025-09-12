@@ -124,7 +124,7 @@ export type PaymentCancelResponse = {
 
 
 export async function fetchMyPayments(memberId: number): Promise<PaymentHistoryItem[]> {
-    const res = await fetch(`${PAYMENT_BASE_URL}/api/vi/payment/query/member`, {
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/v1/payment/query/member`, {
         headers: {
             memberId: String(memberId),
             'X-Authorization-Id': String(memberId),
