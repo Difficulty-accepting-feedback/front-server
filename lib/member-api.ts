@@ -3,7 +3,7 @@ import { MEMBER_BASE_URL } from '@/lib/env';
 type RsData<T> = { code: string; message: string; data: T };
 
 export async function resolveMemberIdByNickname(nickname: string): Promise<number> {
-    const url = `${MEMBER_BASE_URL}/api/members/resolve?nickname=${encodeURIComponent(
+    const url = `${MEMBER_BASE_URL}/api/v1/members/resolve?nickname=${encodeURIComponent(
         nickname.trim(),
     )}`;
     const res = await fetch(url, { credentials: 'include' });

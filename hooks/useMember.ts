@@ -23,7 +23,7 @@ export function useMember() {
         ;(async () => {
             try {
                 setLoading(true)
-                const res = await fetch(`${MEMBER_BASE_URL}/api/members/me`, {
+                const res = await fetch(`${MEMBER_BASE_URL}/api/v1/members/me`, {
                     credentials: 'include',
                 })
                 if (!res.ok) throw new Error(`HTTP ${res.status}`)

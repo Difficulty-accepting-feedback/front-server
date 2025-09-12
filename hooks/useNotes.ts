@@ -53,7 +53,7 @@ type SendNoteRequest = {
 export function useNoteUnreadCount(memberId?: number) {
     return useQuery({
         queryKey: ['notes', 'unread-count', memberId],
-        queryFn: () => getJSON<number>('/api/notes/unread-count', memberId as number),
+        queryFn: () => getJSON<number>('/api/v1/notification/notes/unread-count', memberId as number),
         enabled: !!memberId,
         staleTime: 10_000,
     })
@@ -63,7 +63,7 @@ export function useNoteInbox(memberId?: number, page = 0, size = 3) {
     const qc = useQueryClient()
     return useQuery({
         queryKey: ['notes', 'inbox', memberId, page, size],
-        queryFn: () => getJSON<NotePageResponse>(`/api/notes/inbox?page=${page}&size=${size}`, memberId as number),
+        queryFn: () => getJSON<NotePageResponse>(`/api/v1/notification/notes/inbox?page=${page}&size=${size}`, memberId as number),
         enabled: !!memberId,
         placeholderData: () => {
             if (!memberId || page <= 0) return undefined
@@ -76,7 +76,7 @@ export function useNoteOutbox(memberId?: number, page = 0, size = 3) {
     const qc = useQueryClient()
     return useQuery({
         queryKey: ['notes', 'outbox', memberId, page, size],
-        queryFn: () => getJSON<NotePageResponse>(`/api/notes/outbox?page=${page}&size=${size}`, memberId as number),
+        queryFn: () => getJSON<NotePageResponse>(`/api/v1/notification/notes/outbox?page=${page}&size=${size}`, memberId as number),
         enabled: !!memberId,
         placeholderData: () => {
             if (!memberId || page <= 0) return undefined
@@ -88,7 +88,7 @@ export function useNoteOutbox(memberId?: number, page = 0, size = 3) {
 export function useMarkNoteRead(memberId?: number) {
     const qc = useQueryClient()
     return useMutation({
-        mutationFn: (noteId: number) => postVoid(`/api/notes/${noteId}/read`, memberId as number),
+        mutationFn: (noteId: number) => postVoid(`/api/v1/notification/notes/${noteId}/read`, memberId as number),
         onSuccess: () => {
             qc.invalidateQueries({
                 predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'notes' && q.queryKey.includes(memberId as number),
@@ -101,7 +101,7 @@ export function useMarkNoteRead(memberId?: number) {
 export function useDeleteNote(memberId?: number) {
     const qc = useQueryClient()
     return useMutation({
-        mutationFn: (noteId: number) => delVoid(`/api/notes/${noteId}`, memberId as number),
+        mutationFn: (noteId: number) => delVoid(`/api/v1/notification/notes/${noteId}`, memberId as number),
         onSuccess: () => {
             qc.invalidateQueries({
                 predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'notes' && q.queryKey.includes(memberId as number),
@@ -122,7 +122,7 @@ async function postJSON<T>(path: string, memberId: number, body: unknown): Promi
 export function useSendNote(memberId?: number) {
     const qc = useQueryClient()
     return useMutation({
-        mutationFn: (dto: SendNoteRequest) => postJSON<unknown>('/api/notes', memberId as number, dto),
+        mutationFn: (dto: SendNoteRequest) => postJSON<unknown>('/api/v1/notification/notes', memberId as number, dto),
         onSuccess: () => {
             qc.invalidateQueries({
                 predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'notes' && q.queryKey.includes(memberId as number),

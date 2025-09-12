@@ -11,7 +11,7 @@ export type PlanResponse = {
 };
 
 export async function fetchPlans(): Promise<PlanResponse[]> {
-    const res = await fetch(`${PAYMENT_BASE_URL}/api/plans`, {cache: 'no-store'});
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/v1/payment/plans`, {cache: 'no-store'});
     if (!res.ok) throw new Error('플랜 조회 실패');
     const json: RsData<PlanResponse[]> = await res.json();
     return json.data;
@@ -35,7 +35,7 @@ export async function createOrder(opts: {
 }): Promise<PaymentInitResponse> {
     const {memberId, planId, amount} = opts;
     const res = await fetch(
-        `${PAYMENT_BASE_URL}/api/payments/create?planId=${planId}&amount=${amount}`,
+        `${PAYMENT_BASE_URL}/api/v1/payment/create?planId=${planId}&amount=${amount}`,
         {
             method: 'POST',
             headers: {
@@ -60,7 +60,7 @@ export async function confirmPayment(opts: {
 }): Promise<number> {
     const {memberId, paymentKey, orderId, amount} = opts;
     const idem = opts.idempotencyKey ?? crypto.randomUUID();
-    const res = await fetch(`${PAYMENT_BASE_URL}/api/payments/confirm`, {
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/v1/payment/confirm`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export async function cancelPayment(opts: {
 }): Promise<PaymentCancelResponse> {
     const {memberId, orderId, cancelAmount, cancelReason = 'USER_REQUEST'} = opts;
 
-    const res = await fetch(`${PAYMENT_BASE_URL}/api/payments/cancel`, {
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/v1/payment/cancel`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ export type PaymentCancelResponse = {
 
 
 export async function fetchMyPayments(memberId: number): Promise<PaymentHistoryItem[]> {
-    const res = await fetch(`${PAYMENT_BASE_URL}/api/payments/query/member`, {
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/vi/payment/query/member`, {
         headers: {
             memberId: String(memberId),
             'X-Authorization-Id': String(memberId),
@@ -145,7 +145,7 @@ export async function issueBillingKey(opts: {
     customerKey: string;
 }): Promise<string> {
     const {memberId, orderId, authKey, customerKey} = opts;
-    const res = await fetch(`${PAYMENT_BASE_URL}/api/payments/billing/issue`, {
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/v1/payment/billing/issue`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -188,7 +188,7 @@ export async function autoChargeWithBillingKey(opts: {
 
     const idem = idempotencyKey ?? (crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`);
 
-    const res = await fetch(`${PAYMENT_BASE_URL}/api/payments/billing/charge`, {
+    const res = await fetch(`${PAYMENT_BASE_URL}/api/v1/payment/billing/charge`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

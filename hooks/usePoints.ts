@@ -72,7 +72,7 @@ async function fetchPoints(params: {
     if (startAt) usp.set('startAt', startAt)
     if (endAt) usp.set('endAt', endAt)
 
-    const res = await fetch(`${MEMBER_BASE_URL}/api/points/me?${usp.toString()}`, {
+    const res = await fetch(`${MEMBER_BASE_URL}/api/v1/members/points/me?${usp.toString()}`, {
         credentials: 'include',
     })
 

@@ -22,7 +22,7 @@ export function useNoticeList(groupId: number | null) {
             }
 
             try {
-                const resp = await apiFetch<RsData<NoticeResponse[]>>(`/api/notice/${groupId}`);
+                const resp = await apiFetch<RsData<NoticeResponse[]>>(`/api/v1/notification/notice/${groupId}`);
 
                 // API 응답이 성공적이지 않으면 에러 던지기
                 if (!resp || !resp.data) {
@@ -55,7 +55,7 @@ export function useCreateNotice() {
     return useMutation({
         mutationFn: async (body: NoticeSaveRequest): Promise<RsData<NoticeResponse>> => {
             try {
-                const response = await apiFetch<RsData<NoticeResponse>, NoticeSaveRequest>(`/api/notice/save`, {
+                const response = await apiFetch<RsData<NoticeResponse>, NoticeSaveRequest>(`/api/v1/notification/notice/save`, {
                     method: 'POST',
                     body,
                 });
@@ -123,7 +123,7 @@ export function useDeleteNotice(groupId: number) {
             }
 
             try {
-                const response = await apiFetch<RsData<void>>(`/api/notice/${noticeId}`, {
+                const response = await apiFetch<RsData<void>>(`/api/v1/notification/notice/${noticeId}`, {
                     method: 'DELETE'
                 });
 

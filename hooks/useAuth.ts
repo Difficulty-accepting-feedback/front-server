@@ -13,7 +13,7 @@ export function useAuth() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch(`${MEMBER_BASE_URL}/api/members/me`, { credentials: 'include' })
+        fetch(`${MEMBER_BASE_URL}/api/v1/members/me`, { credentials: 'include' })
             .then(async r => (r.ok ? r.json() : Promise.reject(await r.text())))
             .then((j: MeResp) => setMe(j.data))
             .catch(() => setMe(null))
