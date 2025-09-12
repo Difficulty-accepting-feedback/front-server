@@ -25,7 +25,7 @@ export default function PhoneOnboarding() {
         }
         setLoadingReq(true)
         try {
-            const res = await fetch(`${MEMBER_BASE_URL}/api/verification/request`, {
+            const res = await fetch(`${MEMBER_BASE_URL}/api/v1/members/verification/request`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
                 credentials: 'include',
@@ -49,7 +49,7 @@ export default function PhoneOnboarding() {
         }
         setLoadingVerify(true)
         try {
-            const res = await fetch(`${MEMBER_BASE_URL}/api/verification/verify`, {
+            const res = await fetch(`${MEMBER_BASE_URL}/api/v1/members/verification/verify`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
                 credentials: 'include',

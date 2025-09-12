@@ -32,7 +32,7 @@ export default function AccomplishedPage() {
         ;(async () => {
             try {
                 setLoading(true)
-                const res = await fetch(`${MEMBER_BASE_URL}/api/accomplished/me?page=${page}&size=10`, {
+                const res = await fetch(`${MEMBER_BASE_URL}/api/v1/members/accomplished/me?page=${page}&size=10`, {
                     credentials: 'include',
                 })
                 if (!res.ok) throw new Error(`HTTP ${res.status}`)

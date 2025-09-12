@@ -20,7 +20,7 @@ export function useAccomplishments(limit = 3) {
         ;(async () => {
             try {
                 setLoading(true)
-                const res = await fetch(`${MEMBER_BASE_URL}/api/accomplished/me?page=0&size=${limit}`, {
+                const res = await fetch(`${MEMBER_BASE_URL}/api/v1/members/accomplished/me?page=0&size=${limit}`, {
                     credentials: 'include',
                 })
                 if (!res.ok) throw new Error(`HTTP ${res.status}`)

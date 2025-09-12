@@ -43,7 +43,7 @@ export function useNotificationList(page: number, size: number) {
         enabled: !!memberId,
         queryFn: async () => {
             const rs = await notificationFetch<RsData<PageRs<NotificationListItem>>>(
-                `/api/v1/notification/notifications?page=${page}&size=${size}`,
+                `/api/v1/notification?page=${page}&size=${size}`,
                 { memberId },
             );
             return rs.data;
@@ -60,7 +60,7 @@ export function useUnreadCount() {
         enabled: !!memberId,
         queryFn: async () => {
             const rs = await notificationFetch<RsData<{ count: number }>>(
-                `/api/v1/notification/notifications/unread-count`,
+                `/api/v1/notification/unread-count`,
                 { memberId },
             );
             return rs.data.count;
@@ -77,7 +77,7 @@ export function useMarkAllRead() {
     return useMutation({
         mutationFn: async () => {
             const rs = await notificationFetch<RsData<number>>(
-                `/api/v1/notification/notifications/read-all`,
+                `/api/v1/notification/read-all`,
                 { method: 'POST', memberId },
             );
             return rs.data;
@@ -98,7 +98,7 @@ export function useMarkOneRead() {
     return useMutation({
         mutationFn: async (id: number) => {
             await notificationFetch<RsData<void>>(
-                `/api/v1/notification/notifications/${id}/read`,
+                `/api/v1/notification/${id}/read`,
                 { method: 'POST', memberId },
             );
         },
@@ -117,7 +117,7 @@ export function useDeleteNotification() {
     return useMutation({
         mutationFn: async (id: number) => {
             await notificationFetch<RsData<void>>(
-                `/api/v1/notification/notifications/${id}`,
+                `/api/v1/notification/${id}`,
                 { method: 'DELETE', memberId },
             );
         },
@@ -137,7 +137,7 @@ export function useDeleteOlderThan() {
     return useMutation({
         mutationFn: async (beforeIso: string) => {
             await notificationFetch<RsData<number>>(
-                `/api/v1/notification/notifications/older-than?before=${encodeURIComponent(beforeIso)}`,
+                `/api/v1/notification/older-than?before=${encodeURIComponent(beforeIso)}`,
                 { method: 'DELETE', memberId },
             );
         },
@@ -262,7 +262,7 @@ export function useNotificationSse(opts?: SseOptions) {
             bootstrapRanRef.current = true;
             try {
                 const rs = await notificationFetch<RsData<NotificationListItem[]>>(
-                    `/api/v1/notification/notifications/top?size=${bootstrapN}`,
+                    `/api/v1/notification/top?size=${bootstrapN}`,
                     { memberId },
                 );
                 (rs?.data ?? []).forEach((n) => {
@@ -309,7 +309,6 @@ export function useNotificationSse(opts?: SseOptions) {
 
                 fetchTopUnreadAndToast();
 
-                // eslint-disable-next-line no-console
                 console.info('[SSE] open, memberId=', memberId, 'gen=', myGen);
 
                 const reader = res.body.getReader();
