@@ -45,7 +45,6 @@ function statusLabel(s: string) {
     }
 }
 
-// 취소 가능 조건(필요시 조정)
 function isCancelable(status: string) {
     return status === 'DONE' || status === 'AUTO_BILLING_APPROVED';
 }
@@ -57,21 +56,18 @@ export default function PaymentHistoryPage() {
     const [plans, setPlans] = useState<PlanResponse[]>([]);
     const [busyOrderId, setBusyOrderId] = useState<string | null>(null);
 
-    async function reload(memberId: number) {
-        const [list, planList] = await Promise.all([
-            fetchMyPayments(memberId),
-            fetchPlans(),
-        ]);
+    async function reload() {
+        const [list, planList] = await Promise.all([fetchMyPayments(), fetchPlans()]);
         setItems(list);
         setPlans(planList);
     }
 
     useEffect(() => {
         (async () => {
-            if (!me?.memberId) return;
+            if (!me?.memberId) return; // 로그인 필요
             try {
                 setLoading(true);
-                await reload(me.memberId);
+                await reload();
             } finally {
                 setLoading(false);
             }
@@ -80,13 +76,12 @@ export default function PaymentHistoryPage() {
 
     const planMap = useMemo(() => {
         const m = new Map<number, PlanResponse>();
-        plans.forEach(p => m.set(p.planId, p));
+        plans.forEach((p) => m.set(p.planId, p));
         return m;
     }, [plans]);
 
-    // READY는 숨김
     const filteredItems = useMemo(
-        () => items.filter(p => p.payStatus !== 'READY'),
+        () => items.filter((p) => p.payStatus !== 'READY'),
         [items]
     );
 
@@ -95,10 +90,7 @@ export default function PaymentHistoryPage() {
         if (!p) return <span className="text-zinc-500">-</span>;
 
         const isSub = p.type === 'SUBSCRIPTION';
-        const label = isSub
-            ? `구독·${p.period === 'MONTHLY' ? '월간' : '연간'}`
-            : '일회성';
-
+        const label = isSub ? `구독·${p.period === 'MONTHLY' ? '월간' : '연간'}` : '일회성';
         const cls = isSub
             ? 'border-emerald-300 text-emerald-700 bg-emerald-600/10'
             : 'border-slate-300 text-slate-700 bg-slate-600/10';
@@ -125,19 +117,20 @@ export default function PaymentHistoryPage() {
             return;
         }
         const amount = p.totalAmount ?? 0;
-        const ok = window.confirm(`해당 결제를 취소할까요?\n주문번호: ${p.orderId}\n금액: ₩${amount.toLocaleString('ko-KR')}`);
+        const ok = window.confirm(
+            `해당 결제를 취소할까요?\n주문번호: ${p.orderId}\n금액: ₩${amount.toLocaleString('ko-KR')}`
+        );
         if (!ok) return;
 
         try {
             setBusyOrderId(p.orderId);
             await cancelPayment({
-                memberId: me.memberId,
                 orderId: p.orderId,
-                cancelAmount: amount,           // 전체 취소 (부분취소 필요 시 UI로 금액 입력 받아 전달)
+                cancelAmount: amount,
                 cancelReason: 'USER_REQUEST',
             });
             toast.success('결제가 취소되었습니다.');
-            await reload(me.memberId);
+            await reload();
         } catch (e: any) {
             toast.error(e?.message ?? '결제 취소에 실패했습니다.');
         } finally {
@@ -158,16 +151,16 @@ export default function PaymentHistoryPage() {
     return (
         <Card className="bg-white/80 dark:bg-gray-800/70">
             <CardHeader>
-                <CardTitle className="text-emerald-900 dark:text-emerald-200">
-                    결제 내역
-                </CardTitle>
+                <CardTitle className="text-emerald-900 dark:text-emerald-200">결제 내역</CardTitle>
             </CardHeader>
             <CardContent className="overflow-x-auto">
                 <table className="w-full text-sm">
                     <thead>
                     <tr className="text-left text-muted-foreground">
                         {HEADERS.map((h, idx) => (
-                            <th key={h} className={idx === 0 ? 'py-3' : undefined}>{h}</th>
+                            <th key={h} className={idx === 0 ? 'py-3' : undefined}>
+                                {h}
+                            </th>
                         ))}
                     </tr>
                     </thead>
