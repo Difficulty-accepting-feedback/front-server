@@ -1,6 +1,3 @@
-// lib/notification-api.ts
-import { NOTIFICATION_BASE_URL } from '@/lib/env';
-
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 type FetchOptions<B = unknown> = {
@@ -8,26 +5,27 @@ type FetchOptions<B = unknown> = {
     body?: B;
     headers?: Record<string, string>;
     signal?: AbortSignal;
-    memberId?: number | string;
+    cache?: RequestCache;
 };
 
 export type RsData<T = any> = { code: string; msg?: string; message?: string; data: T };
 
-export async function notificationFetch<TResp, B = unknown>(
+export async function apiFetch<TData = any, TBody = unknown>(
+    baseUrl: string,
     path: string,
-    { method = 'GET', body, headers, signal }: FetchOptions<B> = {},
-): Promise<RsData<TResp>> {
+    { method = 'GET', body, headers, signal, cache = 'no-store' }: FetchOptions<TBody> = {},
+): Promise<TData> {
     const h = new Headers(headers ?? {});
     const hasBody = typeof body !== 'undefined';
     if (hasBody && !h.has('Content-Type')) h.set('Content-Type', 'application/json');
 
-    const res = await fetch(`${NOTIFICATION_BASE_URL}${path}`, {
+    const res = await fetch(`${baseUrl}${path}`, {
         method,
         signal,
-        headers: h,
+        headers: h,                // ✅ 절대 X-Authorization-Id 넣지 않음
         body: method === 'GET' || method === 'DELETE' ? undefined : JSON.stringify(body),
-        credentials: 'include',
-        cache: 'no-store',
+        credentials: 'include',    // ✅ 게이트웨이가 쿠키로 인증
+        cache,
     });
 
     if (!res.ok) {
@@ -36,8 +34,13 @@ export async function notificationFetch<TResp, B = unknown>(
             const e = await res.json();
             errText = (e?.message || e?.msg || JSON.stringify(e)) ?? errText;
         } catch { /* noop */ }
-        throw new Error(`NOTIF ${method} ${path} failed: ${errText}`);
+        throw new Error(`${method} ${path} 실패: ${errText}`);
     }
 
-    return (await res.json()) as RsData<TResp>;  // ✅ 항상 RsData 반환(언래핑 X)
+    const json = (await res.json()) as RsData<TData> | TData;
+    // RsData 래퍼/직접 데이터 모두 대응
+    if (json && typeof json === 'object' && 'data' in (json as any)) {
+        return (json as RsData<TData>).data;
+    }
+    return json as TData;
 }
