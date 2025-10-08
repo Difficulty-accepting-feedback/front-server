@@ -139,7 +139,7 @@ export default function AccountPage() {
         <>
             {/* Daum 우편번호 */}
             <Script
-                src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+                src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
                 strategy="afterInteractive"
                 onLoad={() => setPostcodeReady(true)}
             />
