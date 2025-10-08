@@ -64,7 +64,6 @@ export default function PaymentsPage() {
             setBusyPlanId(plan.planId);
             // 1) 주문 생성 (공통)
             const init = await createOrder({
-                memberId: me.memberId,
                 planId: plan.planId,
                 amount: plan.amount,
             });
