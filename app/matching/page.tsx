@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Loader2, Clock, Sprout, Calendar, MapPin, Pencil, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { MATCHING_BASE_URL } from '@/lib/env'
+import Link from "next/link";
 
 // Enum 타입 정의
 enum Category { STUDY = 'STUDY', HOBBY = 'HOBBY', MENTORING = 'MENTORING' }
@@ -194,7 +195,10 @@ export default function MatchingCheck() {
                         ) : matchings.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-40 space-y-2 text-muted-foreground">
                                 <AlertCircle className="w-8 h-8" />
-                                <p>해당 카테고리에 매칭이 없습니다. 다른 카테고리를 시도해보세요!</p>
+                                <p>해당 카테고리에 매칭이 없습니다. 새로 작성해 보세요!</p>
+                                <Link href="/matching/create">
+                                    <Button>작성하기</Button>
+                                </Link>
                             </div>
                         ) : (
                             <Swiper
