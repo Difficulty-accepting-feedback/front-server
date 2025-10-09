@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import 'swiper/css/navigation'
@@ -23,6 +24,7 @@ enum Level { SEED = 'SEED', SEEDLING = 'SEEDLING', SAPLING = 'SAPLING', BLOOMING
 enum Age { TEENS = 'TEENS', TWENTIES = 'TWENTIES', THIRTIES = 'THIRTIES', FORTIES = 'FORTIES', FIFTIES = 'FIFTIES', SIXTIES = 'SIXTIES', NONE = 'NONE' }
 
 export default function CreateMatching() {
+    const router = useRouter()
     const [swiper, setSwiper] = useState<any>(null)
     const [activeIndex, setActiveIndex] = useState(0)
     const [formData, setFormData] = useState({
@@ -52,6 +54,7 @@ export default function CreateMatching() {
             })
             if (response.ok) {
                 toast.success('매칭 정보가 저장되었습니다!', { description: 'Grow와 함께 성장하세요!' })
+                router.push('/matching')
             } else {
                 toast.error('저장에 실패했습니다.', { description: '다시 시도해주세요.' })
             }
