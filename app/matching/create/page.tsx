@@ -44,7 +44,7 @@ export default function CreateMatching() {
 
     const handleSubmit = async () => {
         try {
-            const response = await fetch(`${MATCHING_BASE_URL}/api/matching/save`, {
+            const response = await fetch(`${MATCHING_BASE_URL}/api/v1/matching/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
