@@ -26,7 +26,6 @@ export default function CreateMatching() {
     const [swiper, setSwiper] = useState<any>(null)
     const [activeIndex, setActiveIndex] = useState(0)
     const [formData, setFormData] = useState({
-        memberId: 1, // 로그인된 사용자 ID로 가정 (실제로는 auth에서 가져옴)
         category: '' as Category,
         mostActiveTime: '' as MostActiveTime,
         level: '' as Level,
@@ -48,6 +47,7 @@ export default function CreateMatching() {
             const response = await fetch(`${MATCHING_BASE_URL}/api/matching/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(formData)
             })
             if (response.ok) {
