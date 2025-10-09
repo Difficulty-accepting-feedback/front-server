@@ -1,4 +1,4 @@
-import { STUDY_BASE_URL } from '@/lib/env'
+import {STUDY_BASE_URL} from '@/lib/env'
 
 export enum Category {
     STUDY = 'STUDY',
@@ -200,6 +200,7 @@ export async function getGroups(category: Category): Promise<GroupResponse[]> {
             'Content-Type': 'application/json',
         },
         cache: 'force-cache', // 캐싱 활성화로 반복 호출 방지
+        credentials: 'include',
     });
 
     if (!res.ok) {
@@ -215,21 +216,22 @@ export async function getGroups(category: Category): Promise<GroupResponse[]> {
 
 export async function getGroupDetail(groupId: number): Promise<GroupDetailResponse> {
     const res = await fetch(`${STUDY_BASE_URL}/api/v1/groups/STUDY/${groupId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    cache: 'no-store', // 상세 조회는 항상 최신 데이터 권장
-  });
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        cache: 'no-store', // 상세 조회는 항상 최신 데이터 권장
+        credentials: 'include',
+    });
 
-  if (!res.ok) {
-    throw new Error('그룹 상세 정보를 불러오는 데 실패했습니다.');
-  }
-    
-  const rsData: RsData<GroupDetailResponse> = await res.json();
-  if (rsData.code !== '200') {
-    throw new Error(rsData.message || 'API 응답 오류');
-  }
+    if (!res.ok) {
+        throw new Error('그룹 상세 정보를 불러오는 데 실패했습니다.');
+    }
 
-  return rsData.data;
+    const rsData: RsData<GroupDetailResponse> = await res.json();
+    if (rsData.code !== '200') {
+        throw new Error(rsData.message || 'API 응답 오류');
+    }
+
+    return rsData.data;
 }
