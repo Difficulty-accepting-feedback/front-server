@@ -67,13 +67,12 @@ const dummyMatchings: MatchingResponse[] = [
 
 export default function MatchingCheck() {
     const [category, setCategory] = useState<Category>(Category.STUDY)
-    const [matchings, setMatchings] = useState<MatchingResponse[]>(dummyMatchings) // 초기 더미 데이터 설정
+    const [matchings, setMatchings] = useState<MatchingResponse[]>([]) // 초기 빈 배열 설정
     const [loading, setLoading] = useState(false)
     const [selectedMatching, setSelectedMatching] = useState<MatchingResponse | null>(null) // 선택된 매칭 상태
     const [editMode, setEditMode] = useState(false) // 편집 모드 상태
     const [editedData, setEditedData] = useState<Partial<MatchingResponse>>({}) // 수정된 데이터 상태
     const [isModalOpen, setIsModalOpen] = useState(false) // 모달 열림 상태
-    const memberId = 1 // 로그인된 ID 가정 (실제 auth에서 가져옴)
 
     useEffect(() => {
         const fetchMatchings = async () => {
@@ -82,21 +81,23 @@ export default function MatchingCheck() {
                 const response = await fetch(`${MATCHING_BASE_URL}/api/matching/check?category=${category}`, {
                     method: 'GET',
                     headers: {
-                        'X-Authorization-Id': memberId.toString(),
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    credentials: 'include'
                 })
+
                 const data = await response.json()
+
                 if (data.code === '200') {
-                    setMatchings(data.data.length > 0 ? data.data : dummyMatchings) // API 데이터가 없으면 더미 사용
+                    setMatchings(data.data || [])
                     toast.success('매칭 목록을 불러왔습니다!', { duration: 2000 })
                 } else {
-                    setMatchings(dummyMatchings) // 오류 시 더미 fallback
-                    toast.error('매칭 조회에 실패했습니다. 더미 데이터를 표시합니다.')
+                    setMatchings([])
+                    toast.error('매칭 조회에 실패했습니다.')
                 }
             } catch (error) {
-                setMatchings(dummyMatchings)
-                toast.error('네트워크 오류가 발생했습니다. 더미 데이터를 표시합니다.')
+                setMatchings([])
+                toast.error('네트워크 오류가 발생했습니다.')
             } finally {
                 setLoading(false)
             }
@@ -130,9 +131,12 @@ export default function MatchingCheck() {
             const response = await fetch(`${MATCHING_BASE_URL}/api/matching/update/${selectedMatching.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(editedData)
+                body: JSON.stringify(editedData),
+                credentials: 'include'
             })
+
             const data = await response.json()
+
             if (data.code === '200') {
                 toast.success('매칭 정보가 수정되었습니다!')
                 setIsModalOpen(false)
@@ -140,11 +144,13 @@ export default function MatchingCheck() {
                 const refreshResponse = await fetch(`${MATCHING_BASE_URL}/api/matching/check?category=${category}`, {
                     method: 'GET',
                     headers: {
-                        'X-Authorization-Id': memberId.toString(),
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    credentials: 'include'
                 })
+
                 const refreshData = await refreshResponse.json()
+
                 if (refreshData.code === '200') {
                     setMatchings(refreshData.data.length > 0 ? refreshData.data : dummyMatchings)
                 }
