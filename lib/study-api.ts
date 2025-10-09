@@ -1,4 +1,4 @@
-import {STUDY_BASE_URL} from '@/lib/env'
+import { STUDY_BASE_URL } from '@/lib/env'
 
 export enum Category {
     STUDY = 'STUDY',
@@ -114,7 +114,7 @@ export const PersonalityTagLabel: Record<PersonalityTag, string> = {
     INSPIRING: '영감을 주는',
     LOYAL: '충성스러운',
     VIBRANT: '생기 넘치는',
-};
+}
 
 export const SkillTagLabel: Record<SkillTag, string> = {
     JAVA_PROGRAMMING: '자바 프로그래밍',
@@ -163,7 +163,7 @@ export const SkillTagLabel: Record<SkillTag, string> = {
     MOBILE_APP_DEVELOPMENT: '모바일 앱 개발',
     GRAPHIC_DESIGN: '그래픽 디자인',
     CONTENT_CREATION: '콘텐츠 제작',
-};
+}
 
 export interface GroupResponse {
     groupId: number;
@@ -187,12 +187,13 @@ export interface GroupDetailResponse {
     skillTag: SkillTag;
 }
 
-interface RsData<T> {
+interface RsData<T = any> {
     code: string;
     message: string;
     data: T;
 }
 
+// 기존 API 함수들
 export async function getGroups(category: Category): Promise<GroupResponse[]> {
     const res = await fetch(`${STUDY_BASE_URL}/api/v1/groups/STUDY`, {
         method: 'GET',
@@ -211,6 +212,7 @@ export async function getGroups(category: Category): Promise<GroupResponse[]> {
     if (rsData.code !== '200') {
         throw new Error(rsData.message || 'API 응답 오류');
     }
+
     return rsData.data || [];
 }
 
@@ -235,3 +237,74 @@ export async function getGroupDetail(groupId: number): Promise<GroupDetailRespon
 
     return rsData.data;
 }
+
+// 검색 관련 API 함수들 (GroupSearchController와 연동)
+export interface GroupDocument {
+    id: string;
+    name: string;
+    description: string;
+    category: string; // Category enum으로 파싱 가능
+    startAt: string; // ISO date string
+    endAt: string; // ISO date string
+    amount: number;
+    viewCount: number;
+    personalityTag: PersonalityTag | null;
+    skillTag: string; // SkillTag enum으로 파싱 가능
+}
+
+export interface SearchGroupsParams {
+    query: string;
+    category?: Category;
+    skillTag?: SkillTag;
+    sortBy?: 'startAt' | 'viewCount'; // 기본 정렬 옵션
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    size?: number;
+}
+
+// 자동 완성 API (suggestions)
+export const getGroupSuggestions = async (query: string): Promise<string[]> => {
+    const response = await fetch(`${STUDY_BASE_URL}/api/v2/groups/suggestions?query=${encodeURIComponent(query)}`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch suggestions: ${response.statusText}`);
+    }
+
+    return response.json();
+};
+
+// 그룹 검색 API
+export const searchGroups = async (params: SearchGroupsParams): Promise<GroupDocument[]> => {
+    const {
+        query,
+        category,
+        skillTag,
+        sortBy = 'startAt',
+        sortOrder = 'desc',
+        page = 1,
+        size = 10,
+    } = params;
+
+    const url = new URL(`${STUDY_BASE_URL}/api/v2/groups/search`);
+    url.searchParams.append('query', query);
+    if (category) url.searchParams.append('category', category);
+    if (skillTag) url.searchParams.append('skillTag', skillTag);
+    url.searchParams.append('sortBy', sortBy);
+    url.searchParams.append('sortOrder', sortOrder);
+    url.searchParams.append('page', page.toString());
+    url.searchParams.append('size', size.toString());
+
+    const response = await fetch(url.toString(), {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to search groups: ${response.statusText}`);
+    }
+
+    return response.json();
+};
