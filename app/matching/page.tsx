@@ -79,7 +79,7 @@ export default function MatchingCheck() {
         const fetchMatchings = async () => {
             setLoading(true)
             try {
-                const response = await fetch(`${MATCHING_BASE_URL}/api/matching/check?category=${category}`, {
+                const response = await fetch(`${MATCHING_BASE_URL}/api/v1/matching/check?category=${category}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -129,7 +129,7 @@ export default function MatchingCheck() {
 
         setLoading(true)
         try {
-            const response = await fetch(`${MATCHING_BASE_URL}/api/matching/update/${selectedMatching.id}`, {
+            const response = await fetch(`${MATCHING_BASE_URL}/api/v1/matching/update/${selectedMatching.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editedData),
@@ -142,7 +142,7 @@ export default function MatchingCheck() {
                 toast.success('매칭 정보가 수정되었습니다!')
                 setIsModalOpen(false)
                 // 목록 새로고침 (재조회)
-                const refreshResponse = await fetch(`${MATCHING_BASE_URL}/api/matching/check?category=${category}`, {
+                const refreshResponse = await fetch(`${MATCHING_BASE_URL}/api/v1/matching/check?category=${category}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
